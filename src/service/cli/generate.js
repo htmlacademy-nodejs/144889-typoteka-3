@@ -4,7 +4,8 @@ const {
   shuffle,
   getRandomDate
 } = require(`../../utils`);
-const fs = require(`fs`);
+const fs = require(`fs`).promises;
+const chalk = require(`chalk`);
 
 const {maxPostsGenerate} = require(`../../constants`);
 
@@ -78,22 +79,19 @@ const generatePosts = (count) => (
 
 module.exports = {
   name: `--generate`,
-  run(args) {
+  async run(args) {
     const [count] = args;
     const countPosts = Number.parseInt(count, 10) || DEFAULT_COUNT;
     if (countPosts > maxPostsGenerate) {
-      console.error(`You can generate max 1000 posts!`);
+      console.error(chalk.red(`You can generate max 1000 posts!`));
       return;
     }
     const content = JSON.stringify(generatePosts(countPosts));
-    fs.writeFile(FILE_NAME, content, (err) => {
-      if (err) {
-        console.error(`Can't write data to file...`);
-        return;
-      }
-
-      console.info(`Operation success. File created.`);
-      return;
-    });
+    try {
+      await fs.writeFile(FILE_NAME, content);
+      console.info(chalk.green(`Operation success. File created.`));
+    } catch (err) {
+      console.error(chalk.red(`Can't write data to file...`));
+    }
   }
 };
