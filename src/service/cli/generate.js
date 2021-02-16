@@ -26,7 +26,7 @@ const readFile = async (filePath) => {
   }
 };
 
-const generatePosts = (count, [sentences, titles, categories]) => (
+const generatePosts = (count, titles, categories, sentences) => (
   Array(count).fill({}).map(() => ({
     title: titles[getRandomInt(0, titles.length - 1)],
     createDate: getRandomDate(),
@@ -42,7 +42,9 @@ const generatePosts = (count, [sentences, titles, categories]) => (
 module.exports = {
   name: `--generate`,
   async run(args) {
-    const data = await Promise.all([readFile(FILE_SENTENCES_PATH), readFile(FILE_TITLES_PATH), readFile(FILE_CATEGORIES_PATH)]);
+    const sentences = await readFile(FILE_SENTENCES_PATH);
+    const titles = await readFile(FILE_TITLES_PATH);
+    const categories = await readFile(FILE_CATEGORIES_PATH);
 
     const [count] = args;
     const countPosts = Number.parseInt(count, 10) || DEFAULT_COUNT;
@@ -50,7 +52,7 @@ module.exports = {
       console.error(chalk.red(`You can generate max 1000 posts!`));
       return;
     }
-    const content = JSON.stringify(generatePosts(countPosts, data));
+    const content = JSON.stringify(generatePosts(countPosts, titles, categories, sentences));
     try {
       await fs.writeFile(FILE_NAME, content);
       console.info(chalk.green(`Operation success. File created.`));
