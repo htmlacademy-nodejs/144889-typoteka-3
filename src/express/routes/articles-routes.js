@@ -5,7 +5,7 @@ const articlesRoutes = new Router();
 
 articlesRoutes.get(`/category/:id`, (req, res) => res.render(`articles-by-category`));
 articlesRoutes.get(`/add`, (req, res) => res.render(`new-post`));
-articlesRoutes.get(`/edit/:id`, (req, res) => res.send(`/articles/edit/:id`)); // нет шаблона
+articlesRoutes.get(`/edit/:id`, (req, res) => res.render(`new-post`)); // нет шаблона
 articlesRoutes.get(`/:id`, (req, res) => res.render(`post`));
 
 module.exports = articlesRoutes;
