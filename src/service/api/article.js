@@ -8,9 +8,8 @@ const instanceValidator = require(`../middlewares/instanceValidator`);
 const articleKeys = [`title`, `announce`, `fullText`, `category`];
 const commentKeys = [`text`];
 
-const route = new Router();
-
 module.exports = (app, articleService, commentService) => {
+  const route = new Router();
   app.use(`/articles`, route);
 
   // GET /api/articles
