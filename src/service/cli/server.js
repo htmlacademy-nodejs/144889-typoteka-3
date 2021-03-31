@@ -3,8 +3,6 @@
 const chalk = require(`chalk`);
 const express = require(`express`);
 const {HttpCode, API_PREFIX} = require(`../../constants`);
-const routes = require(`../api`);
-const getMockData = require(`../lib/getMockData`);
 
 const DEFAULT_PORT = 3000;
 
@@ -17,6 +15,8 @@ module.exports = {
     const app = express();
 
     app.use(express.json());
+
+    const routes = require(`../api`);
     app.use(API_PREFIX, routes);
 
     app.use((req, res) => res
@@ -24,8 +24,6 @@ module.exports = {
       .send(`Not found`));
 
     try {
-      await getMockData();
-
       app.listen(port, (err) => {
         if (err) {
           return console.error(chalk.red(`Ошибка при создании сервера`), err);
