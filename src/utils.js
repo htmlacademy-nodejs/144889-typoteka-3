@@ -29,7 +29,7 @@ const getRandomDate = () => {
 };
 
 const getRandomArrayPart = (arr) => {
-  return arr.slice(getRandomInt(0, (arr.length - 1) / 2), getRandomInt((arr.length - 1) / 2, arr.length - 1));
+  return arr.slice(getRandomInt(0, (arr.length - 1) / 2), getRandomInt((arr.length - 1) / 2, arr.length - 1)).slice(0, 3);
 };
 
 const generateComments = (count, comments) => {
