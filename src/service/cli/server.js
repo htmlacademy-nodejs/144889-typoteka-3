@@ -3,6 +3,7 @@
 const express = require(`express`);
 const {HttpCode, API_PREFIX} = require(`../../constants`);
 const {getLogger} = require(`../lib/logger`);
+const routes = require(`../api`);
 
 const DEFAULT_PORT = 3000;
 const logger = getLogger({name: `api`});
@@ -25,7 +26,6 @@ module.exports = {
       next();
     });
 
-    const routes = require(`../api`);
     app.use(API_PREFIX, routes);
 
     app.use((req, res) => {
