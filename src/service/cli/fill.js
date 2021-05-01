@@ -12,10 +12,12 @@ const {MAX_COMMENTS} = require(`../../constants`);
 const DEFAULT_COUNT = 1;
 const FILE_NAME = `fill-db.sql`;
 
-const FILE_SENTENCES_PATH = `./data/sentences.txt`;
-const FILE_TITLES_PATH = `./data/titles.txt`;
-const FILE_CATEGORIES_PATH = `./data/categories.txt`;
-const FILE_COMMENTS_PATH = `./data/comments.txt`;
+const SOURCES = {
+  SENTENCES: `./data/sentences.txt`,
+  TITLES: `./data/titles.txt`,
+  CATEGORIES: `./data/categories.txt`,
+  COMMENTS: `./data/comments.txt`
+};
 
 const users = [
   {
@@ -68,7 +70,7 @@ const generateArticles = (count, titles, categories, userCount, sentences, comme
 module.exports = {
   name: `--fill`,
   async run(args) {
-    const data = await Promise.all([readFile(FILE_SENTENCES_PATH), readFile(FILE_TITLES_PATH), readFile(FILE_CATEGORIES_PATH), readFile(FILE_COMMENTS_PATH)]);
+    const data = await Promise.all(Object.values(SOURCES).map((path) => readFile(path)));
     const [sentences, titles, categories, commentSentences] = data;
     const [count] = args;
     const countArticles = Number.parseInt(count, 10) || DEFAULT_COUNT;
