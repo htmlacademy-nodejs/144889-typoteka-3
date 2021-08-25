@@ -2,29 +2,33 @@
 
 const express = require(`express`);
 const request = require(`supertest`);
+const Sequelize = require(`sequelize`);
 
 const article = require(`./article`);
 const ArticleService = require(`../data-service/article`);
 const CommentService = require(`../data-service/comment`);
+const initDB = require(`../lib/init-db`);
 
 const {HttpCode} = require(`../../constants`);
 const mockData = require(`./_stubs/article.json`);
+const mockCategories = [`Деревья`, `За жизнь`, `Без рамки`, `Разное`, `IT`, `Музыка`];
 
-const createAPI = () => {
+const createAPI = async () => {
+  const mockDB = new Sequelize(`sqlite::memory:`, {logging: false});
+  await initDB(mockDB, {categories: mockCategories, articles: mockData});
   const app = express();
-  const cloneData = JSON.parse(JSON.stringify(mockData));
   app.use(express.json());
-  article(app, new ArticleService(cloneData), new CommentService());
+  article(app, new ArticleService(mockDB), new CommentService(mockDB));
   return app;
 };
 
 describe(`Article API returns a list of all articles`, () => {
 
-  const app = createAPI();
-
   let response;
+  let app;
 
   beforeAll(async () => {
+    app = await createAPI();
     response = await request(app)
       .get(`/articles`);
   });
@@ -33,23 +37,23 @@ describe(`Article API returns a list of all articles`, () => {
 
   test(`Returns a list of 5 articles`, () => expect(response.body.length).toBe(5));
 
-  test(`First article's id equals "EhSfj5"`, () => expect(response.body[0].id).toBe(`EhSfj5`));
+  test(`First article's title equals "Как начать программировать"`, () => expect(response.body[0].title).toBe(`Как начать программировать`));
 });
 
 describe(`Article API returns an article with given id`, () => {
 
-  const app = createAPI();
-
   let response;
+  let app;
 
   beforeAll(async () => {
+    app = await createAPI();
     response = await request(app)
-      .get(`/articles/z2EOSl`);
+      .get(`/articles/1`);
   });
 
   test(`Status code 200`, () => expect(response.statusCode).toBe(HttpCode.OK));
 
-  test(`article's title is "Лучшие рок-музыканты 20-века"`, () => expect(response.body.title).toBe(`Лучшие рок-музыканты 20-века`));
+  test(`article's title is "Как начать программировать"`, () => expect(response.body.title).toBe(`Как начать программировать`));
 });
 
 describe(`Article API creates an article if data is valid`, () => {
@@ -58,12 +62,14 @@ describe(`Article API creates an article if data is valid`, () => {
     title: `Как сделать из Raspberry Pi автомобильный навигатор за час.`,
     announce: `Чтобы сделать автомобильный навигатор из карманного компьютера Raspberry Pi не нужно ничего паять...`,
     fullText: `Нужно всего лишь зайти на Алиэкспресс и заказать необходимы компоненты. Однако самая большая сложность - ПО. Но OpenSource приходит к нам на помощь!`,
-    category: [`Программирование`, `Железо`]
+    categories: [1, 2, 3]
   };
-  const app = createAPI();
+
   let response;
+  let app;
 
   beforeAll(async () => {
+    app = await createAPI();
     response = await request(app)
       .post(`/articles`)
       .send(newArticle);
@@ -71,8 +77,6 @@ describe(`Article API creates an article if data is valid`, () => {
 
 
   test(`Status code 201`, () => expect(response.statusCode).toBe(HttpCode.CREATED));
-
-  test(`Returns article created`, () => expect(response.body).toEqual(expect.objectContaining(newArticle)));
 
   test(`Articles count is changed`, () => request(app)
     .get(`/articles`)
@@ -88,7 +92,12 @@ describe(`Article API refuses to create an article if data is invalid`, () => {
     fullText: `Нужно всего лишь зайти на Алиэкспресс и заказать необходимы компоненты. Однако самая большая сложность - ПО. Но OpenSource приходит к нам на помощь!`,
     category: [`Программирование`, `Железо`]
   };
-  const app = createAPI();
+
+  let app;
+
+  beforeAll(async () => {
+    app = await createAPI();
+  });
 
   test(`Without any required property response code is 400`, async () => {
     for (const key of Object.keys(newArticle)) {
@@ -108,23 +117,23 @@ describe(`Article API changes existent article`, () => {
     title: `Как сделать из Raspberry Pi автомобильный навигатор за час.`,
     announce: `Чтобы сделать автомобильный навигатор из карманного компьютера Raspberry Pi не нужно ничего паять...`,
     fullText: `Нужно всего лишь зайти на Алиэкспресс и заказать необходимы компоненты. Однако самая большая сложность - ПО. Но OpenSource приходит к нам на помощь!`,
-    category: [`Программирование`, `Железо`]
+    categories: [3, 4, 5]
   };
-  const app = createAPI();
+
   let response;
+  let app;
 
   beforeAll(async () => {
+    app = await createAPI();
     response = await request(app)
-      .put(`/articles/E0DGtY`)
+      .put(`/articles/3`)
       .send(newArticle);
   });
 
   test(`Status code 200`, () => expect(response.statusCode).toBe(HttpCode.OK));
 
-  test(`Returns changed article`, () => expect(response.body).toEqual(expect.objectContaining(newArticle)));
-
   test(`Article is really changed`, () => request(app)
-    .get(`/articles/E0DGtY`)
+    .get(`/articles/3`)
     .expect((res) => expect(res.body.title).toBe(`Как сделать из Raspberry Pi автомобильный навигатор за час.`))
   );
 });
@@ -135,15 +144,16 @@ describe(`Article API refuses when trying to change non-existent article`, () =>
     title: `Как сделать из Raspberry Pi автомобильный навигатор за час.`,
     announce: `Чтобы сделать автомобильный навигатор из карманного компьютера Raspberry Pi не нужно ничего паять...`,
     fullText: `Нужно всего лишь зайти на Алиэкспресс и заказать необходимы компоненты. Однако самая большая сложность - ПО. Но OpenSource приходит к нам на помощь!`,
-    category: [`Программирование`, `Железо`]
+    categories: [1, 2, 3, 4]
   };
 
-  const app = createAPI();
   let response;
+  let app;
 
   beforeAll(async () => {
+    app = await createAPI();
     response = await request(app)
-      .put(`/articles/NOEXST`)
+      .put(`/articles/100`)
       .send(validArticle);
   });
 
@@ -155,16 +165,16 @@ describe(`Article API refuses when trying to change an article with invalid data
   const invalidArticle = {
     title: `Как сделать из Raspberry Pi автомобильный навигатор за час.`,
     announce: `Чтобы сделать автомобильный навигатор из карманного компьютера Raspberry Pi не нужно ничего паять...`,
-    fullText: `Нужно всего лишь зайти на Алиэкспресс и заказать необходимы компоненты. Однако самая большая сложность - ПО. Но OpenSource приходит к нам на помощь!`,
-    categories: [`Программирование`, `Железо`]
+    categories: [1, 2, 3, 4]
   };
 
-  const app = createAPI();
   let response;
+  let app;
 
   beforeAll(async () => {
+    app = await createAPI();
     response = await request(app)
-      .put(`/articles/x-4NU6`)
+      .put(`/articles/4`)
       .send(invalidArticle);
   });
 
@@ -173,18 +183,16 @@ describe(`Article API refuses when trying to change an article with invalid data
 
 describe(`Article API correctly deletes an article`, () => {
 
-  const app = createAPI();
-
   let response;
+  let app;
 
   beforeAll(async () => {
+    app = await createAPI();
     response = await request(app)
-      .delete(`/articles/Hl3Uak`);
+      .delete(`/articles/5`);
   });
 
   test(`Status code 200`, () => expect(response.statusCode).toBe(HttpCode.OK));
-
-  test(`Returns deleted article`, () => expect(response.body.title).toBe(`Как начать программировать`));
 
   test(`Article count is 4 now`, () => request(app)
     .get(`/articles`)
@@ -194,32 +202,32 @@ describe(`Article API correctly deletes an article`, () => {
 
 describe(`Article API refuses to delete non-existent article`, () => {
 
-  test(`Status code 404`, () => {
+  test(`Status code 404`, async () => {
 
-    const app = createAPI();
+    const app = await createAPI();
 
     return request(app)
-      .delete(`/articles/NOEXST`)
+      .delete(`/articles/200`)
       .expect(HttpCode.NOT_FOUND);
   });
 });
 
 describe(`Article API returns a list of comments to given article`, () => {
 
-  const app = createAPI();
-
   let response;
+  let app;
 
   beforeAll(async () => {
+    app = await createAPI();
     response = await request(app)
-      .get(`/articles/Hl3Uak/comments`);
+      .get(`/articles/4/comments`);
   });
 
   test(`Status code 200`, () => expect(response.statusCode).toBe(HttpCode.OK));
 
   test(`Returns list of 4 comments`, () => expect(response.body.length).toBe(4));
 
-  test(`First comment's id is "T0VL_G"`, () => expect(response.body[0].id).toBe(`T0VL_G`));
+  test(`First comment's text is "Согласен с автором! Планируете записать видосик на эту тему? Совсем немного... Плюсую, но слишком много буквы! Хочу такую же футболку :-)"`, () => expect(response.body[0].text).toBe(`Согласен с автором! Планируете записать видосик на эту тему? Совсем немного... Плюсую, но слишком много буквы! Хочу такую же футболку :-)`));
 });
 
 describe(`Article API creates a comment if data is valid`, () => {
@@ -228,13 +236,13 @@ describe(`Article API creates a comment if data is valid`, () => {
     text: `текст валидного комментария`
   };
 
-  const app = createAPI();
-
   let response;
+  let app;
 
   beforeAll(async () => {
+    app = await createAPI();
     response = await request(app)
-      .post(`/articles/Hl3Uak/comments`)
+      .post(`/articles/3/comments`)
       .send(newValidComment);
   });
 
@@ -243,19 +251,19 @@ describe(`Article API creates a comment if data is valid`, () => {
   test(`Returns created comment`, () => expect(response.body.text).toBe(`текст валидного комментария`));
 
   test(`Comments count is changed`, () => request(app)
-    .get(`/articles/Hl3Uak/comments`)
+    .get(`/articles/3/comments`)
     .expect((res) => expect(res.body.length).toBe(5))
   );
 });
 
 describe(`Article API refuses to create a comment to non-existent article`, () => {
 
-  test(`Status code 404`, () => {
+  test(`Status code 404`, async () => {
 
-    const app = createAPI();
+    const app = await createAPI();
 
     return request(app)
-      .post(`/articles/NOEXST/comments`)
+      .post(`/articles/300/comments`)
       .send({
         text: `Неважно, этот комментарий все равно не добавится`
       })
@@ -265,12 +273,12 @@ describe(`Article API refuses to create a comment to non-existent article`, () =
 
 describe(`Article API refuses to create a comment when data is invalid`, () => {
 
-  test(`Status code 400`, () => {
+  test(`Status code 400`, async () => {
 
-    const app = createAPI();
+    const app = await createAPI();
 
     return request(app)
-      .post(`/articles/Hl3Uak/comments`)
+      .post(`/articles/1/comments`)
       .send({
         comment: `Невалидное название поля комментария`
       })
@@ -280,45 +288,42 @@ describe(`Article API refuses to create a comment when data is invalid`, () => {
 
 describe(`Article API correctly deletes a comment`, () => {
 
-  const app = createAPI();
-
   let response;
+  let app;
 
   beforeAll(async () => {
-    response = await request(app)
-      .delete(`/articles/EhSfj5/comments/YDCOHd`);
+    app = await createAPI();
+    response = await request(app).delete(`/articles/1/comments/4`);
   });
 
   test(`Status code 200`, () => expect(response.statusCode).toBe(HttpCode.OK));
 
-  test(`Returns deleted comment`, () => expect(response.body.id).toBe(`YDCOHd`));
-
   test(`Comment count is 3 now`, () => request(app)
-    .get(`/articles/EhSfj5/comments`)
+    .get(`/articles/1/comments`)
     .expect((res) => expect(res.body.length).toBe(3))
   );
 });
 
 describe(`Article API refuses to delete non-existent comment`, () => {
 
-  test(`Status code 404`, () => {
+  test(`Status code 404`, async () => {
 
-    const app = createAPI();
+    const app = await createAPI();
 
     return request(app)
-      .delete(`/articles/z2EOSl/comments/ld07x5`)
+      .delete(`/articles/1/comments/100`)
       .expect(HttpCode.NOT_FOUND);
   });
 });
 
 describe(`Article API refuses to delete a comment to non-existent article`, () => {
 
-  test(`Status code 404`, () => {
+  test(`Status code 404`, async () => {
 
-    const app = createAPI();
+    const app = await createAPI();
 
     return request(app)
-      .delete(`/articles/z2EOE4/comments/k3HWdj`)
+      .delete(`/articles/200/comments/1`)
       .expect(HttpCode.NOT_FOUND);
   });
 });
