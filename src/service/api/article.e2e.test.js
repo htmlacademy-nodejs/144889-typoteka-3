@@ -22,6 +22,34 @@ const createAPI = async () => {
   return app;
 };
 
+describe(`Article API creates an article if data is valid`, () => {
+
+  const newArticle = {
+    title: `Как сделать из Raspberry Pi автомобильный навигатор за час.`,
+    announce: `Чтобы сделать автомобильный навигатор из карманного компьютера Raspberry Pi не нужно ничего паять...`,
+    fullText: `Нужно всего лишь зайти на Алиэкспресс и заказать необходимы компоненты. Однако самая большая сложность - ПО. Но OpenSource приходит к нам на помощь!`,
+    categories: [1, 2, 3]
+  };
+
+  let response;
+  let app;
+
+  beforeAll(async () => {
+    app = await createAPI();
+    response = await request(app)
+      .post(`/articles`)
+      .send(newArticle);
+  });
+
+
+  test(`Status code 201`, () => expect(response.statusCode).toBe(HttpCode.CREATED));
+
+  test(`Articles count is changed`, () => request(app)
+    .get(`/articles`)
+    .expect((res) => expect(res.body.length).toBe(6))
+  );
+});
+
 describe(`Article API returns a list of all articles`, () => {
 
   let response;
@@ -54,34 +82,6 @@ describe(`Article API returns an article with given id`, () => {
   test(`Status code 200`, () => expect(response.statusCode).toBe(HttpCode.OK));
 
   test(`article's title is "Как начать программировать"`, () => expect(response.body.title).toBe(`Как начать программировать`));
-});
-
-describe(`Article API creates an article if data is valid`, () => {
-
-  const newArticle = {
-    title: `Как сделать из Raspberry Pi автомобильный навигатор за час.`,
-    announce: `Чтобы сделать автомобильный навигатор из карманного компьютера Raspberry Pi не нужно ничего паять...`,
-    fullText: `Нужно всего лишь зайти на Алиэкспресс и заказать необходимы компоненты. Однако самая большая сложность - ПО. Но OpenSource приходит к нам на помощь!`,
-    categories: [1, 2, 3]
-  };
-
-  let response;
-  let app;
-
-  beforeAll(async () => {
-    app = await createAPI();
-    response = await request(app)
-      .post(`/articles`)
-      .send(newArticle);
-  });
-
-
-  test(`Status code 201`, () => expect(response.statusCode).toBe(HttpCode.CREATED));
-
-  test(`Articles count is changed`, () => request(app)
-    .get(`/articles`)
-    .expect((res) => expect(res.body.length).toBe(6))
-  );
 });
 
 describe(`Article API refuses to create an article if data is invalid`, () => {
