@@ -2,16 +2,24 @@
 
 const express = require(`express`);
 const request = require(`supertest`);
+const Sequelize = require(`sequelize`);
 
 const search = require(`./search`);
 const SearchService = require(`../data-service/search`);
+const initDB = require(`../lib/init-db`);
 
 const {HttpCode} = require(`../../constants`);
 const mockData = require(`./_stubs/search.json`);
+const mockCategories = [`Деревья`, `За жизнь`, `Без рамки`, `Разное`, `IT`, `Музыка`];
+const mockDB = new Sequelize(`sqlite::memory:`, {logging: false});
 
 const app = express();
 app.use(express.json());
-search(app, new SearchService(mockData));
+
+beforeAll(async () => {
+  await initDB(mockDB, {categories: mockCategories, articles: mockData});
+  search(app, new SearchService(mockDB));
+});
 
 describe(`Search API - positive cases: returns article based on search query and`, () => {
 
@@ -27,7 +35,7 @@ describe(`Search API - positive cases: returns article based on search query and
 
   test(`Status code 200`, () => expect(response.statusCode).toBe(HttpCode.OK));
   test(`1 article found`, () => expect(response.body.length).toBe(1));
-  test(`Article has correct id`, () => expect(response.body[0].id).toBe(`9y26BX`));
+  test(`Article has correct title`, () => expect(response.body[0].title).toBe(`Очки или контактные линзы`));
 });
 
 describe(`Search API - negative case: nothing is found and`, () => {

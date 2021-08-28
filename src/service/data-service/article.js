@@ -1,46 +1,51 @@
 'use strict';
 
-const {nanoid} = require(`nanoid`);
-const {MAX_ID_LENGTH} = require(`../../constants`);
-const {getRandomDate} = require(`../../utils`);
+const Aliase = require(`../models/aliase`);
 
 class ArticleService {
-  constructor(articles) {
-    this._articles = articles;
+  constructor(sequelize) {
+    this._Article = sequelize.models.Article;
+    this._Comment = sequelize.models.Comment;
+    this._Category = sequelize.models.Category;
   }
 
-  create(article) {
-    const newArticle = Object
-      .assign({id: nanoid(MAX_ID_LENGTH), createDate: getRandomDate(), comments: []}, article);
+  async create(articleData) {
+    const article = await this._Article.create(articleData);
+    await article.addCategories(articleData.categories);
 
-    this._articles.push(newArticle);
-    return newArticle;
+    return article.get();
   }
 
-  delete(id) {
-    const article = this._articles.find((item) => item.id === id);
+  async delete(id) {
+    const deletedArticle = await this._Article.destroy({
+      where: {id}
+    });
+    return !!deletedArticle;
+  }
 
-    if (!article) {
-      return null;
+  async findAll(needComments) {
+    const include = [Aliase.CATEGORIES];
+    if (needComments) {
+      include.push(Aliase.COMMENTS);
     }
+    const articles = await this._Article.findAll({include});
+    return articles.map((item) => item.get());
+  }
 
-    this._articles = this._articles.filter((item) => item.id !== id);
+  async findOne(id, needComments) {
+    const include = [Aliase.CATEGORIES];
+    if (needComments) {
+      include.push(Aliase.COMMENTS);
+    }
+    const article = await this._Article.findByPk(id, {include});
     return article;
   }
 
-  findAll() {
-    return this._articles;
-  }
-
-  findOne(id) {
-    return this._articles.find((item) => item.id === id);
-  }
-
-  update(id, article) {
-    const oldArticle = this._articles
-      .find((item) => item.id === id);
-
-    return Object.assign(oldArticle, article);
+  async update(id, article) {
+    const [updatedArticle] = await this._Article.update(article, {
+      where: {id}
+    });
+    return !!updatedArticle;
   }
 
 }

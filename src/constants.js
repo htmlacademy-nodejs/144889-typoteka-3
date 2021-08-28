@@ -4,10 +4,6 @@ const DEFAULT_COMMAND = `--help`;
 
 const USER_ARGV_INDEX = 2;
 
-const maxPostsGenerate = 1000;
-
-const MAX_ID_LENGTH = 6;
-
 const MAX_COMMENTS = 4;
 
 const API_PREFIX = `/api`;
@@ -35,8 +31,6 @@ const Env = {
 module.exports = {
   DEFAULT_COMMAND,
   USER_ARGV_INDEX,
-  maxPostsGenerate,
-  MAX_ID_LENGTH,
   MAX_COMMENTS,
   API_PREFIX,
   ExitCode,

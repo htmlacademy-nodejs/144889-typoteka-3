@@ -35,7 +35,7 @@ articlesRoutes.post(`/add`, upload.single(`upload`), async (req, res) => {
     title: body.title,
     announce: body.announcement,
     fullText: body.fullText,
-    category: Array.isArray(body.category) ? body.category : [body.category]
+    categories: Array.isArray(body.categories) ? body.categories : [body.categories]
   };
 
   if (file) {
@@ -65,7 +65,7 @@ articlesRoutes.post(`/edit/:id`, upload.single(`upload`), async (req, res) => {
     title: body.title,
     announce: body.announcement,
     fullText: body.fullText,
-    category: Array.isArray(body.category) ? body.category : [body.category]
+    categories: Array.isArray(body.categories) ? body.categories : [body.categories]
   };
 
   if (file) {
@@ -83,6 +83,11 @@ articlesRoutes.post(`/edit/:id`, upload.single(`upload`), async (req, res) => {
   }
 });
 
-articlesRoutes.get(`/:id`, (req, res) => res.render(`post`));
+articlesRoutes.get(`/:id`, async (req, res) => {
+  const {id} = req.params;
+  const article = await api.getArticle(id, true);
+
+  res.render(`post`, {article});
+});
 
 module.exports = articlesRoutes;

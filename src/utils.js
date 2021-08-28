@@ -1,9 +1,5 @@
 'use strict';
 
-const {nanoid} = require(`nanoid`);
-
-const {MAX_ID_LENGTH} = require(`./constants`);
-
 const getRandomInt = (min, max) => {
   min = Math.ceil(min);
   max = Math.floor(max);
@@ -35,10 +31,23 @@ const getRandomArrayPart = (arr) => {
 const generateComments = (count, comments) => {
   return (
     Array(count).fill({}).map(() => ({
-      id: nanoid(MAX_ID_LENGTH),
       text: getRandomArrayPart(shuffle(comments)).join(` `),
     }))
   );
+};
+
+const getRandomSubarray = (items) => {
+  const tempItems = items.slice();
+  let count = getRandomInt(1, tempItems.length - 1);
+  const result = [];
+  while (count--) {
+    result.push(
+        ...tempItems.splice(
+            getRandomInt(0, tempItems.length - 1), 1
+        )
+    );
+  }
+  return result;
 };
 
 module.exports = {
@@ -46,5 +55,6 @@ module.exports = {
   shuffle,
   getRandomDate,
   getRandomArrayPart,
-  generateComments
+  generateComments,
+  getRandomSubarray
 };

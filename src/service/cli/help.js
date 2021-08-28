@@ -12,7 +12,7 @@ module.exports = {
       Команды:
       --version:            выводит номер версии
       --help:               печатает этот текст
-      --generate <count>    формирует файл mocks.json
+      --filldb              наполняет БД данными
       --server <port>       запускает сервер
       --fill <count>        генерирует fill-db.sql
     `;
