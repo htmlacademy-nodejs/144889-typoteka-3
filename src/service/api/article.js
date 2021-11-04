@@ -11,9 +11,14 @@ module.exports = (app, articleService, commentService) => {
 
   // GET /api/articles
   route.get(`/`, async (req, res) => {
-    const {comments} = req.query;
-    const articles = await articleService.findAll(comments);
-    res.status(HttpCode.OK).json(articles);
+    const {offset, limit, comments} = req.query;
+    let result;
+    if (limit || offset) {
+      result = await articleService.findPage({limit, offset, comments});
+    } else {
+      result = await articleService.findAll(comments);
+    }
+    res.status(HttpCode.OK).json(result);
   });
 
   // GET /api/articles/:articleId

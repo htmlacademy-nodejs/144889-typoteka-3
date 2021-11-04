@@ -12,7 +12,7 @@ module.exports = {
       Команды:
       --version:            выводит номер версии
       --help:               печатает этот текст
-      --filldb              наполняет БД данными
+      --filldb <count>      наполняет БД данными
       --server <port>       запускает сервер
       --fill <count>        генерирует fill-db.sql
     `;
