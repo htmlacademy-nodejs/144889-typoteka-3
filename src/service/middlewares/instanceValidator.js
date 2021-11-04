@@ -1,15 +1,17 @@
 'use strict';
 
 const {HttpCode} = require(`../../constants`);
+const schemas = require(`./schemas`);
 
-module.exports = (keysToCheck) => (req, res, next) => {
+module.exports = (instanceType) => (req, res, next) => {
   const newInstance = req.body;
-  const keys = Object.keys(newInstance);
-  const keysExists = keysToCheck.every((key) => keys.includes(key));
 
-  if (!keysExists) {
+  const schema = schemas[instanceType];
+  const {error} = schema.validate(newInstance, {abortEarly: false});
+
+  if (error) {
     res.status(HttpCode.BAD_REQUEST)
-      .send(`Bad request`);
+      .send(error.details.map((err) => err.message).join(`\n`));
     return;
   }
 

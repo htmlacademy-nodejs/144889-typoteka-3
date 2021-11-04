@@ -28,6 +28,18 @@ const Env = {
   PRODUCTION: `production`
 };
 
+const HttpMethod = {
+  GET: `GET`,
+  POST: `POST`,
+  PUT: `PUT`,
+  DELETE: `DELETE`
+};
+
+const instances = {
+  COMMENT: `comment`,
+  ARTICLE: `article`
+};
+
 module.exports = {
   DEFAULT_COMMAND,
   USER_ARGV_INDEX,
@@ -35,5 +47,7 @@ module.exports = {
   API_PREFIX,
   ExitCode,
   HttpCode,
-  Env
+  Env,
+  HttpMethod,
+  instances
 };

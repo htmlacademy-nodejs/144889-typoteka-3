@@ -90,7 +90,7 @@ describe(`Article API refuses to create an article if data is invalid`, () => {
     title: `Как сделать из Raspberry Pi автомобильный навигатор за час.`,
     announce: `Чтобы сделать автомобильный навигатор из карманного компьютера Raspberry Pi не нужно ничего паять...`,
     fullText: `Нужно всего лишь зайти на Алиэкспресс и заказать необходимы компоненты. Однако самая большая сложность - ПО. Но OpenSource приходит к нам на помощь!`,
-    category: [`Программирование`, `Железо`]
+    categories: [1, 2, 3]
   };
 
   let app;
@@ -103,6 +103,37 @@ describe(`Article API refuses to create an article if data is invalid`, () => {
     for (const key of Object.keys(newArticle)) {
       const badArticle = {...newArticle};
       delete badArticle[key];
+      await request(app)
+        .post(`/articles`)
+        .send(badArticle)
+        .expect(HttpCode.BAD_REQUEST);
+    }
+  });
+
+  test(`When field type is wrong response code is 400`, async () => {
+    const badArticles = [
+      {...newArticle, title: true},
+      {...newArticle, announce: 12345},
+      {...newArticle, fullText: {}},
+      {...newArticle, categories: `Программирование`},
+      {...newArticle, photo: []}
+    ];
+    for (const badArticle of badArticles) {
+      await request(app)
+        .post(`/articles`)
+        .send(badArticle)
+        .expect(HttpCode.BAD_REQUEST);
+    }
+  });
+
+  test(`When field value is wrong response code is 400`, async () => {
+    const badArticles = [
+      {...newArticle, title: -1},
+      {...newArticle, announce: `too short`},
+      {...newArticle, fullText: []},
+      {...newArticle, categories: [`Программирование`, `Железо`]}
+    ];
+    for (const badArticle of badArticles) {
       await request(app)
         .post(`/articles`)
         .send(badArticle)
@@ -280,7 +311,7 @@ describe(`Article API refuses to create a comment when data is invalid`, () => {
     return request(app)
       .post(`/articles/1/comments`)
       .send({
-        comment: `Невалидное название поля комментария`
+        text: `too short comment`
       })
       .expect(HttpCode.BAD_REQUEST);
   });

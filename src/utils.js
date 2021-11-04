@@ -50,11 +50,16 @@ const getRandomSubarray = (items) => {
   return result;
 };
 
+const prepareErrors = (errors) => {
+  return errors.response.data.split(`\n`);
+};
+
 module.exports = {
   getRandomInt,
   shuffle,
   getRandomDate,
   getRandomArrayPart,
   generateComments,
-  getRandomSubarray
+  getRandomSubarray,
+  prepareErrors
 };
