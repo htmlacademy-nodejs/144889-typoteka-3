@@ -1,12 +1,9 @@
 'use strict';
 
 const {Router} = require(`express`);
-const {HttpCode} = require(`../../constants`);
+const {HttpCode, instances} = require(`../../constants`);
 const articleExist = require(`../middlewares/articleExist`);
 const instanceValidator = require(`../middlewares/instanceValidator`);
-
-const articleKeys = [`title`, `announce`, `fullText`, `categories`];
-const commentKeys = [`text`];
 
 module.exports = (app, articleService, commentService) => {
   const route = new Router();
@@ -40,14 +37,14 @@ module.exports = (app, articleService, commentService) => {
   });
 
   // POST /api/articles
-  route.post(`/`, instanceValidator(articleKeys), async (req, res) => {
+  route.post(`/`, instanceValidator(instances.ARTICLE), async (req, res) => {
     const article = await articleService.create(req.body);
     return res.status(HttpCode.CREATED)
       .json(article);
   });
 
   // PUT /api/articles/:articleId
-  route.put(`/:articleId`, instanceValidator(articleKeys), async (req, res) => {
+  route.put(`/:articleId`, instanceValidator(instances.ARTICLE), async (req, res) => {
     const {articleId} = req.params;
     const updatedArticle = await articleService.update(articleId, req.body);
 
@@ -95,7 +92,7 @@ module.exports = (app, articleService, commentService) => {
   });
 
   // POST /api/articles/:articleId/comments
-  route.post(`/:articleId/comments`, [articleExist(articleService), instanceValidator(commentKeys)], async (req, res) => {
+  route.post(`/:articleId/comments`, [articleExist(articleService), instanceValidator(instances.COMMENT)], async (req, res) => {
     const {articleId} = req.params;
     const createdComment = await commentService.create(articleId, req.body);
 

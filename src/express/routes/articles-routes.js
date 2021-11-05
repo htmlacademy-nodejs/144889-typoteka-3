@@ -5,6 +5,7 @@ const {Router} = require(`express`);
 const multer = require(`multer`);
 const path = require(`path`);
 const {nanoid} = require(`nanoid`);
+const {prepareErrors} = require(`../../utils`);
 
 const UPLOAD_DIR = `../upload/img/`;
 const uploadDirAbsolute = path.resolve(__dirname, UPLOAD_DIR);
@@ -22,10 +23,26 @@ const storage = multer.diskStorage({
 
 const upload = multer({storage});
 
+const getArticleCategories = async () => {
+  return await api.getCategories();
+};
+
+const getEditArticleData = async (articleId) => {
+  const [offer, categories] = await Promise.all([
+    api.getArticle(articleId),
+    api.getCategories()
+  ]);
+  return [offer, categories];
+};
+
+const getViewArticleData = async (articleId, comments) => {
+  return await api.getArticle(articleId, comments);
+};
+
 articlesRoutes.get(`/category/:id`, (req, res) => res.render(`articles-by-category`));
 
 articlesRoutes.get(`/add`, async (req, res) => {
-  const categories = await api.getCategories();
+  const categories = await getArticleCategories();
   res.render(`new-post`, {categories});
 });
 
@@ -45,21 +62,23 @@ articlesRoutes.post(`/add`, upload.single(`upload`), async (req, res) => {
   try {
     await api.createArticle(articleData);
     res.redirect(`/my`);
-  } catch (error) {
-    res.redirect(`back`);
+  } catch (errors) {
+    const validationMessages = prepareErrors(errors);
+    const categories = await getArticleCategories();
+    res.render(`new-post`, {categories, validationMessages});
   }
 });
 
 articlesRoutes.get(`/edit/:id`, async (req, res) => {
   const {id} = req.params;
-  const [article, categories] = await Promise.all([api.getArticle(id), api.getCategories()]);
+  const [article, categories] = await getEditArticleData(id);
   res.render(`edit-post`, {article, categories});
 });
 
 articlesRoutes.post(`/edit/:id`, upload.single(`upload`), async (req, res) => {
   const {body, file} = req;
   const {id} = req.params;
-  const article = await api.getArticle(id);
+  const currentArticle = await api.getArticle(id);
 
   const updateArticle = {
     title: body.title,
@@ -72,22 +91,37 @@ articlesRoutes.post(`/edit/:id`, upload.single(`upload`), async (req, res) => {
     updateArticle.picture = file.filename;
   }
 
-  const articleData = Object.assign(article, updateArticle);
+  const articleData = Object.assign(currentArticle, updateArticle);
 
   try {
     await api.updateArticle(articleData, id);
     res.redirect(`/my`);
-  } catch (error) {
-    console.error(error.message);
-    res.redirect(`back`);
+  } catch (errors) {
+    const validationMessages = prepareErrors(errors);
+    const [article, categories] = await getEditArticleData(id);
+    res.render(`edit-post`, {article, categories, validationMessages});
   }
 });
 
 articlesRoutes.get(`/:id`, async (req, res) => {
   const {id} = req.params;
-  const article = await api.getArticle(id, true);
+  const article = await getViewArticleData(id, true);
 
   res.render(`post`, {article});
+});
+
+articlesRoutes.post(`/:id/comments`, async (req, res) => {
+  const {id} = req.params;
+  const {comment} = req.body;
+
+  try {
+    await api.createComment(id, {text: comment});
+    res.redirect(`/articles/${id}`);
+  } catch (errors) {
+    const validationMessages = prepareErrors(errors);
+    const article = await getViewArticleData(id, true);
+    res.render(`post`, {article, comment, validationMessages});
+  }
 });
 
 module.exports = articlesRoutes;
