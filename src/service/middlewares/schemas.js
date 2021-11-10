@@ -2,7 +2,7 @@
 
 const Joi = require(`joi`);
 
-const {instances} = require(`../../constants`);
+const {Instances} = require(`../../constants`);
 
 const ErrorCommentMessage = {
   TEXT_MIN: `Комментарий содержит меньше 20 символов`,
@@ -56,7 +56,7 @@ const routeParamsSchema = Joi.object({
 });
 
 module.exports = {
-  [instances.COMMENT]: commentSchema,
-  [instances.ARTICLE]: articleSchema,
+  [Instances.COMMENT]: commentSchema,
+  [Instances.ARTICLE]: articleSchema,
   routeParamsSchema
 };

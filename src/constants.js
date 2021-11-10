@@ -35,7 +35,7 @@ const HttpMethod = {
   DELETE: `DELETE`
 };
 
-const instances = {
+const Instances = {
   COMMENT: `comment`,
   ARTICLE: `article`
 };
@@ -49,5 +49,5 @@ module.exports = {
   HttpCode,
   Env,
   HttpMethod,
-  instances
+  Instances
 };
