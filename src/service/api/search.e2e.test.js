@@ -7,17 +7,31 @@ const Sequelize = require(`sequelize`);
 const search = require(`./search`);
 const SearchService = require(`../data-service/search`);
 const initDB = require(`../lib/init-db`);
-
+const passwordUtils = require(`../lib/password`);
 const {HttpCode} = require(`../../constants`);
 const mockData = require(`./_stubs/search.json`);
 const mockCategories = [`Деревья`, `За жизнь`, `Без рамки`, `Разное`, `IT`, `Музыка`];
+const mockUsers = [
+  {
+    name: `Иван Иванов`,
+    email: `ivanov@example.com`,
+    passwordHash: passwordUtils.hashSync(`ivanov`),
+    avatar: `avatar-1.png`
+  },
+  {
+    name: `Пётр Петров`,
+    email: `petrov@example.com`,
+    passwordHash: passwordUtils.hashSync(`petrov`),
+    avatar: `avatar-2.png`
+  }
+];
 const mockDB = new Sequelize(`sqlite::memory:`, {logging: false});
 
 const app = express();
 app.use(express.json());
 
 beforeAll(async () => {
-  await initDB(mockDB, {categories: mockCategories, articles: mockData});
+  await initDB(mockDB, {categories: mockCategories, articles: mockData, users: mockUsers});
   search(app, new SearchService(mockDB));
 });
 

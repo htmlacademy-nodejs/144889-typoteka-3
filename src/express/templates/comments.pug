@@ -8,8 +8,8 @@ block content
         each article in articles
           li.publication__list-item
             .publication__header
-              img.publication__list-image(src='/img/avatar-small-2.png' alt='Аватар пользователя' width='20' height='20')
-              b.publication__list-name Александр Петров
+              img.publication__list-image(src=`/img/${article.users.avatar}` alt='Аватар пользователя' width='20' height='20')
+              b.publication__list-name #{article.users.name}
               time.publication__item-time(datetime='2019-03-21T20:33') #{article.createDate}
             a.publication__item-text(href='#') #{article.title}
             each comment in article.comments
