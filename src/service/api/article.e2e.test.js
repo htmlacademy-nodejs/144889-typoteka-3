@@ -8,14 +8,28 @@ const article = require(`./article`);
 const ArticleService = require(`../data-service/article`);
 const CommentService = require(`../data-service/comment`);
 const initDB = require(`../lib/init-db`);
-
+const passwordUtils = require(`../lib/password`);
 const {HttpCode} = require(`../../constants`);
 const mockData = require(`./_stubs/article.json`);
 const mockCategories = [`Деревья`, `За жизнь`, `Без рамки`, `Разное`, `IT`, `Музыка`];
+const mockUsers = [
+  {
+    name: `Иван Иванов`,
+    email: `ivanov@example.com`,
+    passwordHash: passwordUtils.hashSync(`ivanov`),
+    avatar: `avatar-1.png`
+  },
+  {
+    name: `Пётр Петров`,
+    email: `petrov@example.com`,
+    passwordHash: passwordUtils.hashSync(`petrov`),
+    avatar: `avatar-2.png`
+  }
+];
 
 const createAPI = async () => {
   const mockDB = new Sequelize(`sqlite::memory:`, {logging: false});
-  await initDB(mockDB, {categories: mockCategories, articles: mockData});
+  await initDB(mockDB, {categories: mockCategories, articles: mockData, users: mockUsers});
   const app = express();
   app.use(express.json());
   article(app, new ArticleService(mockDB), new CommentService(mockDB));
@@ -28,7 +42,9 @@ describe(`Article API creates an article if data is valid`, () => {
     title: `Как сделать из Raspberry Pi автомобильный навигатор за час.`,
     announce: `Чтобы сделать автомобильный навигатор из карманного компьютера Raspberry Pi не нужно ничего паять...`,
     fullText: `Нужно всего лишь зайти на Алиэкспресс и заказать необходимы компоненты. Однако самая большая сложность - ПО. Но OpenSource приходит к нам на помощь!`,
-    categories: [1, 2, 3]
+    categories: [1, 2, 3],
+    photo: `forest@2x.jpg`,
+    userId: 1
   };
 
   let response;
@@ -90,7 +106,8 @@ describe(`Article API refuses to create an article if data is invalid`, () => {
     title: `Как сделать из Raspberry Pi автомобильный навигатор за час.`,
     announce: `Чтобы сделать автомобильный навигатор из карманного компьютера Raspberry Pi не нужно ничего паять...`,
     fullText: `Нужно всего лишь зайти на Алиэкспресс и заказать необходимы компоненты. Однако самая большая сложность - ПО. Но OpenSource приходит к нам на помощь!`,
-    categories: [1, 2, 3]
+    categories: [1, 2, 3],
+    userId: 1
   };
 
   let app;
@@ -148,7 +165,9 @@ describe(`Article API changes existent article`, () => {
     title: `Как сделать из Raspberry Pi автомобильный навигатор за час.`,
     announce: `Чтобы сделать автомобильный навигатор из карманного компьютера Raspberry Pi не нужно ничего паять...`,
     fullText: `Нужно всего лишь зайти на Алиэкспресс и заказать необходимы компоненты. Однако самая большая сложность - ПО. Но OpenSource приходит к нам на помощь!`,
-    categories: [3, 4, 5]
+    categories: [3, 4, 5],
+    photo: `forest@2x.jpg`,
+    userId: 1
   };
 
   let response;
@@ -175,7 +194,9 @@ describe(`Article API refuses when trying to change non-existent article`, () =>
     title: `Как сделать из Raspberry Pi автомобильный навигатор за час.`,
     announce: `Чтобы сделать автомобильный навигатор из карманного компьютера Raspberry Pi не нужно ничего паять...`,
     fullText: `Нужно всего лишь зайти на Алиэкспресс и заказать необходимы компоненты. Однако самая большая сложность - ПО. Но OpenSource приходит к нам на помощь!`,
-    categories: [1, 2, 3, 4]
+    categories: [1, 2, 3, 4],
+    photo: `forest@2x.jpg`,
+    userId: 1
   };
 
   let response;
@@ -196,7 +217,8 @@ describe(`Article API refuses when trying to change an article with invalid data
   const invalidArticle = {
     title: `Как сделать из Raspberry Pi автомобильный навигатор за час.`,
     announce: `Чтобы сделать автомобильный навигатор из карманного компьютера Raspberry Pi не нужно ничего паять...`,
-    categories: [1, 2, 3, 4]
+    categories: [1, 2, 3, 4],
+    userId: 1
   };
 
   let response;
@@ -264,7 +286,8 @@ describe(`Article API returns a list of comments to given article`, () => {
 describe(`Article API creates a comment if data is valid`, () => {
 
   const newValidComment = {
-    text: `текст валидного комментария`
+    text: `текст валидного комментария`,
+    userId: 1
   };
 
   let response;
@@ -311,7 +334,7 @@ describe(`Article API refuses to create a comment when data is invalid`, () => {
     return request(app)
       .post(`/articles/1/comments`)
       .send({
-        text: `too short comment`
+        text: `comment without userId field`
       })
       .expect(HttpCode.BAD_REQUEST);
   });

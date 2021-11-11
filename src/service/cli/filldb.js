@@ -10,6 +10,7 @@ const fs = require(`fs`).promises;
 const chalk = require(`chalk`);
 const {getLogger} = require(`../lib/logger`);
 const sequelize = require(`../lib/sequelize`);
+const passwordUtils = require(`../lib/password`);
 const initDatabase = require(`../lib/init-db`);
 
 const {MAX_COMMENTS, ExitCode} = require(`../../constants`);
@@ -31,14 +32,16 @@ const readFile = async (filePath) => {
   }
 };
 
-const generatePosts = (count, [sentences, titles, categories, comments]) => (
+const generatePosts = (count, [sentences, titles, categories, comments], users) => (
   Array(count).fill({}).map(() => ({
     title: titles[getRandomInt(0, titles.length - 1)],
     createDate: getRandomDate(),
     announce: shuffle(sentences).slice(1, 5).join(` `),
     fullText: shuffle(sentences).slice(1, getRandomInt(6, (sentences.length - 1))).join(` `),
     categories: getRandomSubarray(categories),
-    comments: generateComments(MAX_COMMENTS, comments),
+    comments: generateComments(MAX_COMMENTS, comments, users),
+    user: users[getRandomInt(0, users.length - 1)].email,
+    photo: `sea-fullsize@1x.jpg`
   }))
 );
 
@@ -57,12 +60,26 @@ module.exports = {
     logger.info(`The connection to database is established`);
 
     const data = await Promise.all([readFile(FILE_SENTENCES_PATH), readFile(FILE_TITLES_PATH), readFile(FILE_CATEGORIES_PATH), readFile(FILE_COMMENTS_PATH)]);
+    const users = [
+      {
+        name: `Иван Иванов`,
+        email: `ivanov@example.com`,
+        passwordHash: await passwordUtils.hash(`ivanov`),
+        avatar: `avatar-1.png`
+      },
+      {
+        name: `Пётр Петров`,
+        email: `petrov@example.com`,
+        passwordHash: await passwordUtils.hash(`petrov`),
+        avatar: `avatar-2.png`
+      }
+    ];
 
     const [count] = args;
     const countPosts = Number.parseInt(count, 10) || DEFAULT_COUNT;
-    const articles = generatePosts(countPosts, data);
+    const articles = generatePosts(countPosts, data, users);
     const categories = data[2];
 
-    return initDatabase(sequelize, {articles, categories});
+    return initDatabase(sequelize, {articles, categories, users});
   }
 };

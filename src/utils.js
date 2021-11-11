@@ -28,9 +28,10 @@ const getRandomArrayPart = (arr) => {
   return arr.slice(getRandomInt(0, (arr.length - 1) / 2), getRandomInt((arr.length - 1) / 2, arr.length - 1)).slice(0, 3);
 };
 
-const generateComments = (count, comments) => {
+const generateComments = (count, comments, users) => {
   return (
     Array(count).fill({}).map(() => ({
+      user: users[getRandomInt(0, users.length - 1)].email,
       text: getRandomArrayPart(shuffle(comments)).join(` `),
     }))
   );

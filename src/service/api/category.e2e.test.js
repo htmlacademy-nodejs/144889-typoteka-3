@@ -7,17 +7,31 @@ const Sequelize = require(`sequelize`);
 const category = require(`./category`);
 const CategoryService = require(`../data-service/category`);
 const initDB = require(`../lib/init-db`);
-
+const passwordUtils = require(`../lib/password`);
 const {HttpCode} = require(`../../constants`);
 const mockData = require(`./_stubs/category.json`);
 const mockCategories = [`Деревья`, `За жизнь`, `Без рамки`, `Разное`, `IT`, `Музыка`];
+const mockUsers = [
+  {
+    name: `Иван Иванов`,
+    email: `ivanov@example.com`,
+    passwordHash: passwordUtils.hashSync(`ivanov`),
+    avatar: `avatar-1.png`
+  },
+  {
+    name: `Пётр Петров`,
+    email: `petrov@example.com`,
+    passwordHash: passwordUtils.hashSync(`petrov`),
+    avatar: `avatar-2.png`
+  }
+];
 const mockDB = new Sequelize(`sqlite::memory:`, {logging: false});
 
 const app = express();
 app.use(express.json());
 
 beforeAll(async () => {
-  await initDB(mockDB, {categories: mockCategories, articles: mockData});
+  await initDB(mockDB, {categories: mockCategories, articles: mockData, users: mockUsers});
   category(app, new CategoryService(mockDB));
 });
 

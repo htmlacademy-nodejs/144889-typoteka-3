@@ -16,7 +16,11 @@ const define = (sequelize) => Article.init({
   fullText: {
     type: DataTypes.TEXT,
     allowNull: false
-  }
+  },
+  photo: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
 }, {
   sequelize,
   modelName: `Article`,

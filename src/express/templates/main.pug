@@ -59,7 +59,7 @@ block content
                 li.preview__breadcrumbs-item
                   a.preview__breadcrumbs-link(href='#') #{category.name}
             .preview__background
-              img.preview__background-image(src='/img/skyscraper@1x.jpg' srcset='/img/skyscraper@1x.jpg 1x, /img/skyscraper@2x.jpg 2x' alt='Фотография небоскреба' width='460' height='240')
+              img.preview__background-image(src=`/img/${article.photo}` alt='Фотография небоскреба' width='460' height='240')
             time.preview__time(datetime=article.createDate) #{article.createDate}
             h3.preview__name
               a.preview__name-link(href=`/articles/${article.id}`) #{article.title}
