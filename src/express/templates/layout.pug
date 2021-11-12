@@ -19,8 +19,14 @@ html(lang='ru')
       li..pagination__item--active a{
         pointer-events: none;
       }
-      .preview__breadcrumbs {
+      .preview__breadcrumbs, .new-publication__checkbox {
         flex-wrap: wrap;
+      }
+      .new-publication__checkbox label {
+        margin: 0 5px 5px 0;
+      }
+      .notes__item-text {
+        padding-right: 35px;
       }
   body
     mixin postDate(dateString)
@@ -36,7 +42,12 @@ html(lang='ru')
           const date = new Date(dateString);
           return date.toLocaleString();
         }
-      time.comments__date(datetime='2019-03-21T20:33') #{formatDate(article.createdAt)}
+      time.comments__date(datetime='2019-03-21T20:33') #{formatDate(dateString)}
+    mixin todayDate()
+      -
+        const dateNow = new Date().toISOString().slice(0, 10)
+      label(for='new-publication-date' aria-label='Календарь')
+      input#new-publication-date(type='text' name='date' placeholder=dateNow)
     mixin pagination(page, totalPages, width, prefix)
       -
         let start = page - width;
