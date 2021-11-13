@@ -2,11 +2,14 @@
 
 const api = require(`../api`).getApi();
 const {Router} = require(`express`);
+const csrf = require(`csurf`);
 
 const upload = require(`../middlewares/upload`);
 const {prepareErrors} = require(`../../utils`);
+const auth = require(`../middlewares/auth`);
 
 const articlesRoutes = new Router();
+const csrfProtection = csrf();
 
 const getArticleCategories = async () => {
   return await api.getCategories();
@@ -24,20 +27,26 @@ const getViewArticleData = async (articleId, comments) => {
   return await api.getArticle(articleId, comments);
 };
 
-articlesRoutes.get(`/category/:id`, (req, res) => res.render(`articles-by-category`));
-
-articlesRoutes.get(`/add`, async (req, res) => {
-  const categories = await getArticleCategories();
-  res.render(`new-post`, {categories});
+articlesRoutes.get(`/category/:id`, (req, res) => {
+  const {user} = req.session;
+  res.render(`articles-by-category`, {user});
 });
 
-articlesRoutes.post(`/add`, upload.single(`upload`), async (req, res) => {
+articlesRoutes.get(`/add`, auth, csrfProtection, async (req, res) => {
+  const {user} = req.session;
+  const categories = await getArticleCategories();
+  res.render(`new-post`, {categories, user, csrfToken: req.csrfToken()});
+});
+
+articlesRoutes.post(`/add`, auth, upload.single(`upload`), csrfProtection, async (req, res) => {
+  const {user} = req.session;
   const {body, file} = req;
   const articleData = {
     title: body.title,
     announce: body.announcement,
     fullText: body.fullText,
-    categories: Array.isArray(body.categories) ? body.categories : [body.categories]
+    categories: Array.isArray(body.categories) ? body.categories : [body.categories],
+    userId: user.id
   };
 
   if (file) {
@@ -50,17 +59,19 @@ articlesRoutes.post(`/add`, upload.single(`upload`), async (req, res) => {
   } catch (errors) {
     const validationMessages = prepareErrors(errors);
     const categories = await getArticleCategories();
-    res.render(`new-post`, {categories, validationMessages});
+    res.render(`new-post`, {categories, validationMessages, user, csrfToken: req.csrfToken()});
   }
 });
 
-articlesRoutes.get(`/edit/:id`, async (req, res) => {
+articlesRoutes.get(`/edit/:id`, auth, csrfProtection, async (req, res) => {
+  const {user} = req.session;
   const {id} = req.params;
   const [article, categories] = await getEditArticleData(id);
-  res.render(`edit-post`, {article, categories});
+  res.render(`edit-post`, {article, categories, user, csrfToken: req.csrfToken()});
 });
 
-articlesRoutes.post(`/edit/:id`, upload.single(`upload`), async (req, res) => {
+articlesRoutes.post(`/edit/:id`, auth, upload.single(`upload`), csrfProtection, async (req, res) => {
+  const {user} = req.session;
   const {body, file} = req;
   const {id} = req.params;
   const currentArticle = await api.getArticle(id);
@@ -69,12 +80,10 @@ articlesRoutes.post(`/edit/:id`, upload.single(`upload`), async (req, res) => {
     title: body.title,
     announce: body.announcement,
     fullText: body.fullText,
-    categories: Array.isArray(body.categories) ? body.categories : [body.categories]
+    categories: Array.isArray(body.categories) ? body.categories : [body.categories],
+    photo: file ? file.filename : body[`photo`],
+    userId: user.id
   };
-
-  if (file) {
-    updateArticle.picture = file.filename;
-  }
 
   const articleData = Object.assign(currentArticle, updateArticle);
 
@@ -84,28 +93,30 @@ articlesRoutes.post(`/edit/:id`, upload.single(`upload`), async (req, res) => {
   } catch (errors) {
     const validationMessages = prepareErrors(errors);
     const [article, categories] = await getEditArticleData(id);
-    res.render(`edit-post`, {article, categories, validationMessages});
+    res.render(`edit-post`, {article, categories, validationMessages, user, csrfToken: req.csrfToken()});
   }
 });
 
-articlesRoutes.get(`/:id`, async (req, res) => {
+articlesRoutes.get(`/:id`, csrfProtection, async (req, res) => {
+  const {user} = req.session;
   const {id} = req.params;
   const article = await getViewArticleData(id, true);
 
-  res.render(`post`, {article});
+  res.render(`post`, {article, user, csrfToken: req.csrfToken()});
 });
 
-articlesRoutes.post(`/:id/comments`, async (req, res) => {
+articlesRoutes.post(`/:id/comments`, csrfProtection, async (req, res) => {
+  const {user} = req.session;
   const {id} = req.params;
   const {comment} = req.body;
 
   try {
-    await api.createComment(id, {text: comment});
+    await api.createComment(id, {text: comment, userId: user.id});
     res.redirect(`/articles/${id}`);
   } catch (errors) {
     const validationMessages = prepareErrors(errors);
     const article = await getViewArticleData(id, true);
-    res.render(`post`, {article, comment, validationMessages});
+    res.render(`post`, {article, comment, validationMessages, user, csrfToken: req.csrfToken()});
   }
 });
 

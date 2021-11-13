@@ -6,14 +6,14 @@ block content
       .popup.popup--new-publication.popup--anti
         .new-publication
           form(action='/articles/add' method='POST' enctype='multipart/form-data' autocomplete='off')
+            input(type="hidden" name="_csrf" value=csrfToken)
             .new-publication__header
               h1 Новая публикация
               .new-publication__date-form
                 h3 Дата публикации
                 .new-publication__date-form-division
                   .new-publication__date-block
-                    label(for='new-publication-date' aria-label='Календарь')
-                    input#new-publication-date(type='text' name='date' placeholder='2019-03-21')
+                    +todayDate()
               +insertErrorMessages(validationMessages)
               button.new-publication__button.button.button--colored(type='submit') Опубликовать
             a.popup__button.button.button--popup-close(aria-label='Закрыть окно')

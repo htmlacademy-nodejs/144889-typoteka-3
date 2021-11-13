@@ -81,7 +81,10 @@ describe(`Article API returns a list of all articles`, () => {
 
   test(`Returns a list of 5 articles`, () => expect(response.body.length).toBe(5));
 
-  test(`First article's title equals "Как начать программировать"`, () => expect(response.body[0].title).toBe(`Как начать программировать`));
+  test(`First article's title equals "Как начать программировать"`, () => {
+    const first = response.body.find((item) => item.id === 1);
+    expect(first.title).toBe(`Как начать программировать`);
+  });
 });
 
 describe(`Article API returns an article with given id`, () => {

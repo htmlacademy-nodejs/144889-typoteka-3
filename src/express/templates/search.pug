@@ -8,7 +8,7 @@ block content
         .search.search-page__form
           form(action='/search' method='get')
             label
-              input(type='text' name='search' placeholder='Что ищем?')
+              input(type='text' name='search' placeholder='Что ищем?' value=search)
             button.search__button.button.button--transparent(type='submit') Найти
           each result in results
             .search__result

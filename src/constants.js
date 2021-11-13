@@ -40,6 +40,8 @@ const Instances = {
   ARTICLE: `article`
 };
 
+const FILE_TYPES = [`image/png`, `image/jpg`, `image/jpeg`];
+
 module.exports = {
   DEFAULT_COMMAND,
   USER_ARGV_INDEX,
@@ -49,5 +51,6 @@ module.exports = {
   HttpCode,
   Env,
   HttpMethod,
-  Instances
+  Instances,
+  FILE_TYPES
 };

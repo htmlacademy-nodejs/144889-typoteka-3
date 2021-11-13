@@ -7,7 +7,7 @@ block content
       ul.notes__list
         each article in articles
           li.notes__list-item
-            time.notes__item-time(datetime='2019-03-21T20:33') #{article.createDate}
+            time.notes__item-time(datetime='2019-03-21T20:33') #{new Date(article.createdAt).toLocaleString()}
             a.notes__item-text(href=`/articles/${article.id}`) #{article.announce}
             button.notes__button.button.button--close-item(type='button')
               span.visually-hidden Закрыть строку списка
