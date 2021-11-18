@@ -9,6 +9,7 @@
     "eslint": "eslint --ext .js src/",
     "start-back-server": "cross-env LOG_LEVEL=error NODE_ENV=production node -r dotenv/config ./src/service/service.js --server",
     "start-back-server::debug": "cross-env LOG_LEVEL=info NODE_ENV=development node -r dotenv/config ./src/service/service.js --server",
+    "start-cli": "cross-env LOG_LEVEL=info NODE_ENV=development node -r dotenv/config ./src/service/service.js",
     "start-front-server": "nodemon -r dotenv/config ./src/express/index.js",
     "start": "concurrently \"npm run start-back-server\" \"npm run start-front-server\"",
     "start-dev": "concurrently \"npm run start-back-server::debug\" \"npm run start-front-server\""
