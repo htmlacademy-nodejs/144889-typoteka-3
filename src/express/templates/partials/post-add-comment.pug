@@ -1,0 +1,14 @@
+if (user)
+  .comments__footer.comments__footer--user
+    form(action=`/articles/${article.id}/comments` method='POST')
+      input(type="hidden" name="_csrf" value=csrfToken)
+      .comments__avatar.avatar
+        img(src=`/img/${user.avatar || `avatar-sample.png`}` alt='аватар пользователя')
+      label
+        textarea(rows='1' name='comment' placeholder='Присоединиться к обсуждению')= `${comment ? comment : ''}`
+      button.comments__button.button.button--colored(type='submit') Опубликовать
+    +insertErrorMessages(validationMessages)
+else
+  .comments__footer.comments__footer--non-user
+    p Чтобы присоединиться к переписке нужно зарегистрироваться
+    a.comments__button.button.button--colored(href='/login') Войти

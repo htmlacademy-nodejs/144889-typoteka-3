@@ -1,0 +1,19 @@
+h2.visually-hidden Список превью статей
+ul.preview__list
+  each article in articles
+    li.preview__item
+      ul.preview__breadcrumbs
+        each category in article.categories
+          li.preview__breadcrumbs-item
+            a.preview__breadcrumbs-link(href=`/articles/category/${category.id}`) #{category.name}
+      .preview__background
+        img.preview__background-image(src=`/img/${article.photo}` alt='Фотография небоскреба' width='460' height='240')
+      time.preview__time(datetime=article.createDate) #{formatPostDate(article.createDate)}
+      h3.preview__name
+        a.preview__name-link(href=`/articles/${article.id}`) #{article.title}
+      p.preview__text #{article.announce}
+      if article.comments
+        a.preview__comment(href=`/articles/${article.id}`)
+          | Комментарии 
+          span.preview__cloud
+          b.preview__comment-count #{article.comments.length}

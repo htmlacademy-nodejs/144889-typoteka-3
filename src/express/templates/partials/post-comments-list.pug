@@ -1,0 +1,14 @@
+if (article.comments.length)
+  ul.comments__list
+    each comment in article.comments
+      li.comments__comment
+        .comments__avatar.avatar
+          img(src=`/img/${comment.users.avatar || `avatar-sample.png`}` alt='Аватар пользователя')
+        .comments__text
+          .comments__head
+            p #{comment.users.name} •
+            +commentDate(comment.createdAt)
+          p.comments__message #{comment.text}
+else
+  .comments__none
+    p У этой публикации еще нет ни одного комментария.

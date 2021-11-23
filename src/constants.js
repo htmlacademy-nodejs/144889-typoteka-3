@@ -37,7 +37,8 @@ const HttpMethod = {
 
 const Instances = {
   COMMENT: `comment`,
-  ARTICLE: `article`
+  ARTICLE: `article`,
+  CATEGORY: `category`
 };
 
 const FILE_TYPES = [`image/png`, `image/jpg`, `image/jpeg`];

@@ -3,70 +3,15 @@ extends layout.pug
 block content
   main.main-page
     h1.visually-hidden Главная страница личного блога Типотека
-    p
-      | Это приветственный текст, который владелец блога может выбрать, чтобы описать себя 👏
-    section.main-page__theme-list
-      h2.visually-hidden Список тем
-      ul.themes
-        each category in categories
-          li.themes__item
-            a.themes__item-link(href=`/articles/category/${category.id}`)
-              | #{category.name}
-              sup #{category.count}
-    .main-page__section-flex
-      section.main-page__hot.hot
-        h2.hot__name
-          | Самое обсуждаемое 
-          span.hot__icon.hot__icon--fire
-        ul.hot__list
-          each article in articles.slice(0, 4)
-            li.hot__list-item
-              a.hot__list-link(href=`/articles/${article.id}`) #{article.title}
-                if article.comments
-                  sup.hot__link-sup #{article.comments.length}
-      section.main-page__last.last
-        h2.last__name
-          | Последние комментарии 
-          span.last__icon.last__icon--cloud
-        ul.last__list
-          li.last__list-item
-            img.last__list-image(src='/img/avatar-small-1.png' alt='Аватар пользователя' width='20' height='20')
-            b.last__list-name Анна Артамонова
-            a.last__list-link(href='#')
-              | Сервис аренды жилья Airbnb стал глобальным партнером Международного
-              | олимпийского комитета
-              | (МОК) на девять лет, в течение которых пройдет пять Олимпиад, в том числе в Токио в 2020 году.
-          li.last__list-item
-            img.last__list-image(src='/img/avatar-small-2.png' alt='Аватар пользователя' width='20' height='20')
-            b.last__list-name Александр Петров
-            a.last__list-link(href='#')
-              | Главреды «Дождя», Forbes и других СМИ попросили Роскомнадзор
-              | разъяснить штрафы за ссылки на
-              | сайты с матом
-          li.last__list-item.last__list-item--end
-            img.last__list-image(src='/img/avatar-small-3.png' alt='Аватар пользователя' width='20' height='20')
-            b.last__list-name Игорь Шманский
-            a.last__list-link(href='#')
-              | Что-то все электрокары в последнее время все на одно лицо
-              | делаются))
-    section.main-page__list.preview
-      h2.visually-hidden Список превью статей
-      ul.preview__list
-        each article in articles
-          li.preview__item
-            ul.preview__breadcrumbs
-              each category in article.categories
-                li.preview__breadcrumbs-item
-                  a.preview__breadcrumbs-link(href='#') #{category.name}
-            .preview__background
-              img.preview__background-image(src=`/img/${article.photo}` alt='Фотография небоскреба' width='460' height='240')
-            time.preview__time(datetime=article.createDate) #{article.createDate}
-            h3.preview__name
-              a.preview__name-link(href=`/articles/${article.id}`) #{article.title}
-            p.preview__text #{article.announce}
-            if article.comments
-              a.preview__comment(href='#')
-                | Комментарии 
-                span.preview__cloud
-                b.preview__comment-count #{article.comments.length}
-    +pagination(page, totalPages, 2, `?`)
+    p Добро пожаловать в Типотеку
+    if (articles.length)
+      include partials/main-categories.pug
+      .main-page__section-flex
+        include partials/main-best-commented.pug
+        include partials/main-last-comments.pug
+      section.main-page__list.preview
+        include partials/main-previews.pug
+      if (totalPages > 1)
+        +pagination(page, totalPages, 2, `?`)
+    else
+      include partials/main-empty.pug

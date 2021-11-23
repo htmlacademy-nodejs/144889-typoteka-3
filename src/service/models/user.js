@@ -20,6 +20,10 @@ const define = (sequelize) => User.init({
   },
   avatar: {
     type: DataTypes.STRING,
+    allowNull: true
+  },
+  isOwner: {
+    type: DataTypes.BOOLEAN,
     allowNull: false
   }
 }, {

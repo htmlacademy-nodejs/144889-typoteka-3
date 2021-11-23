@@ -10,7 +10,11 @@ block content
             label
               input(type='text' name='search' placeholder='Что ищем?' value=search)
             button.search__button.button.button--transparent(type='submit') Найти
-          each result in results
+          if (results.length)
+            each result in results
+              .search__result
+                time.search__date(datetime='2019-03-21T20:33') #{formatPostDate(result.createDate)}
+                a.search__link(href=`/articles/${result.id}`) #{result.title}
+          else
             .search__result
-              time.search__date(datetime='2019-03-21T20:33') 21.03.2019, 20:33
-              a.search__link #{result.title}
+              p Ничего не найшлось!

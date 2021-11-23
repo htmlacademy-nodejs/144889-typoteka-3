@@ -22,6 +22,12 @@ module.exports = (app, articleService, commentService) => {
     res.status(HttpCode.OK).json(result);
   });
 
+  // GET /api/articles/comments
+  route.get(`/comments`, async (req, res) => {
+    const result = await commentService.findAllComments();
+    res.status(HttpCode.OK).json(result);
+  });
+
   // GET /api/articles/:articleId
   route.get(`/:articleId`, routeParamsValidator, async (req, res) => {
     const {articleId} = req.params;
@@ -58,16 +64,25 @@ module.exports = (app, articleService, commentService) => {
   });
 
   // DELETE /api/articles/:articleId
-  route.delete(`/:articleId`, routeParamsValidator, async (req, res) => {
+  route.delete(`/:articleId`, [routeParamsValidator, articleExist(articleService)], async (req, res) => {
     const {articleId} = req.params;
+    const article = await articleService.findOne(articleId, {comments: true});
+    const comments = article.comments.map((item) => item.id);
     const deletedArticle = await articleService.delete(articleId);
+    const deletedComments = await Promise.all(comments.map((commentId) => commentService.delete(commentId)));
 
     if (!deletedArticle) {
       return res.status(HttpCode.NOT_FOUND)
         .send(`Not found article with id ${articleId}`);
     }
 
-    return res.status(HttpCode.OK).send(`Article successfully deleted`);
+    const allCommentsDeleted = deletedComments.every((item) => item);
+    if (!allCommentsDeleted) {
+      return res.status(HttpCode.NOT_FOUND)
+        .send(`Some comments not found`);
+    }
+
+    return res.status(HttpCode.OK).send(`Article and comments successfully deleted`);
   });
 
   // GET /api/articles/:articleId/comments

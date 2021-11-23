@@ -1,0 +1,13 @@
+section.main-page__last.last
+  h2.last__name
+      | Последние комментарии 
+      span.last__icon.last__icon--cloud
+  ul.last__list
+    if lastComments.length
+      each comment in lastComments
+        li.last__list-item
+          img.last__list-image(src=`/img/${comment.users.avatar || `avatar-sample.png`}` alt='Аватар пользователя' width='20' height='20')
+          b.last__list-name #{comment.users.name}
+          a.last__list-link(href=`/articles/${comment.articleId}`) #{comment.length > 100 ? comment.text.slice(0, 100).concat('...') : comment.text}
+    else
+      p Здесь пока ничего нет :(

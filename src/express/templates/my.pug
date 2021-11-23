@@ -4,10 +4,16 @@ block content
   main.main-page.main-page--padding
     section.main-page__notes.notes
       h1.notes__title Мои записи
-      ul.notes__list
-        each article in articles
-          li.notes__list-item
-            time.notes__item-time(datetime='2019-03-21T20:33') #{new Date(article.createdAt).toLocaleString()}
-            a.notes__item-text(href=`/articles/${article.id}`) #{article.announce}
-            button.notes__button.button.button--close-item(type='button')
-              span.visually-hidden Закрыть строку списка
+      if (validationMessages)
+        +insertErrorMessages(validationMessages)
+      if articles.length
+        ul.notes__list
+          each article in articles
+            li.notes__list-item
+              time.notes__item-time(datetime='2019-03-21T20:33') #{formatPostDate(article.createDate)}
+              a.notes__item-text(href=`/articles/${article.id}`) #{article.title}
+              .notes__item-buttons
+                a.button.red(href=`/articles/delete/${article.id}`) Удалить публикацию
+                a.button(href=`/articles/edit/${article.id}`) Редактировать публикацию
+      else
+        p Здесь пока ничего нет :(

@@ -16,13 +16,15 @@ const mockUsers = [
     name: `Иван Иванов`,
     email: `ivanov@example.com`,
     passwordHash: passwordUtils.hashSync(`ivanov`),
-    avatar: `avatar-1.png`
+    avatar: `avatar-1.png`,
+    isOwner: true
   },
   {
     name: `Пётр Петров`,
     email: `petrov@example.com`,
     passwordHash: passwordUtils.hashSync(`petrov`),
-    avatar: `avatar-2.png`
+    avatar: `avatar-2.png`,
+    isOwner: false
   }
 ];
 const mockDB = new Sequelize(`sqlite::memory:`, {logging: false});

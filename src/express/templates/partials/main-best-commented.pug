@@ -1,0 +1,13 @@
+section.main-page__hot.hot
+  h2.hot__name
+    | Самое обсуждаемое 
+    span.hot__icon.hot__icon--fire
+  ul.hot__list
+    if bestCommentedArticles.length
+      each article in bestCommentedArticles
+        li.hot__list-item
+          a.hot__list-link(href=`/articles/${article.id}`) #{article.announce.length > 100 ? article.announce.slice(0, 100).concat('...') : article.announce}
+            if article.comments
+              sup.hot__link-sup #{article.comments.length}
+    else
+      p Здесь пока ничего нет :(

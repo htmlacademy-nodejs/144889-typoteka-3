@@ -27,7 +27,7 @@ class SearchService {
         }
       ],
       order: [
-        [`createdAt`, `DESC`]
+        [`createDate`, `DESC`]
       ]
     });
 

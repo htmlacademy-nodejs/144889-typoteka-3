@@ -16,7 +16,10 @@ html(lang='ru')
         margin: 5px 0;
         padding-left: 63px;
       }
-      li..pagination__item--active a{
+      .pagination {
+        justify-content: center;
+      }
+      li.pagination__item--active a{
         pointer-events: none;
       }
       .preview__breadcrumbs, .new-publication__checkbox {
@@ -28,26 +31,81 @@ html(lang='ru')
       .notes__item-text {
         padding-right: 35px;
       }
+      .comments__none {
+        padding-left: 40px;
+      }
+      .notes__item-buttons {
+        display: flex;
+        justify-content: flex-end;
+      }
+      .notes__item-buttons .button {
+        margin: 10px;
+      }
+      .notes__item-buttons .button.red {
+        color: red;
+        font-weight: bold;
+      }
+      .publication__text-strong {
+        margin: 0;
+      }
+      .post__head .preview__breadcrumbs {
+        padding-left: 0;
+      }
+      .post__announce {
+        font-style: italic;
+        margin-bottom: 20px;
+      }
+      .comments__footer--non-user {
+        display: flex;
+        justify-content: space-between;
+      }
+      .avatar {
+        background: none;
+      }
+      .header {
+        padding-bottom: 0;
+      }
+      .owner-menu {
+        display: flex;
+        justify-content: flex-end;
+        padding: 10px 30px 40px 30px;
+        min-height: 30px;
+      }
+      .add_post__button, .edit_post__button {
+        width: 200px;
+      }
+      .edit_post__button {
+        font-size: 15px;
+      }
   body
+    -
+      const formatPostDate = (dateString) => {
+        const date = new Date(dateString);
+        return date.toLocaleString('ru-RU', {day: '2-digit', month: '2-digit', year: 'numeric'}).split('-').reverse().join('.');
+      }
     mixin postDate(dateString)
-      -
-        const formatDate = (dateString) => {
-          const date = new Date(dateString);
-          return date.toLocaleString();
-        }
-      time.post__date(datetime='2019-03-21T20:33') #{formatDate(article.createdAt)}
+      time.post__date(datetime='2019-03-21T20:33') #{formatPostDate(dateString)}
     mixin commentDate(dateString)
       -
-        const formatDate = (dateString) => {
-          const date = new Date(dateString);
-          return date.toLocaleString();
+        const formatCommentDate = (dateString) => {
+          let date = new Date(dateString);
+          date = date.toLocaleString('ru-RU', {day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'});
+          let [day, time] = date.split(' ');
+          day = day.split('-').reverse().join('.');
+          date = [day, time].join(', ');
+          return date;
         }
-      time.comments__date(datetime='2019-03-21T20:33') #{formatDate(dateString)}
+      time.comments__date(datetime='2019-03-21T20:33') #{formatCommentDate(dateString)}
     mixin todayDate()
       -
         const dateNow = new Date().toISOString().slice(0, 10)
       label(for='new-publication-date' aria-label='Календарь')
-      input#new-publication-date(type='text' name='date' placeholder=dateNow)
+      input#new-publication-date(type='text' name='createDate' placeholder=dateNow value=dateNow)
+    mixin editArticleDate(dateString)
+      -
+        const dateNow = new Date(dateString).toISOString().slice(0, 10)
+      label(for='new-publication-date' aria-label='Календарь')
+      input#new-publication-date(type='text' name='createDate' placeholder=dateNow value=dateNow)
     mixin pagination(page, totalPages, width, prefix)
       -
         let start = page - width;

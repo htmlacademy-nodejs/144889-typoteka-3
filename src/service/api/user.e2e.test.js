@@ -16,13 +16,15 @@ const mockUsers = [
     name: `Иван Иванов`,
     email: `ivanov@example.com`,
     passwordHash: passwordUtils.hashSync(`ivanov`),
-    avatar: `avatar-1.png`
+    avatar: `avatar-1.png`,
+    isOwner: true
   },
   {
     name: `Пётр Петров`,
     email: `petrov@example.com`,
     passwordHash: passwordUtils.hashSync(`petrov`),
-    avatar: `avatar-2.png`
+    avatar: `avatar-2.png`,
+    isOwner: false
   }
 ];
 
@@ -61,8 +63,7 @@ describe(`Users API refuses to create user if data is invalid`, () => {
     name: `Сидор Сидоров`,
     email: `sidorov@example.com`,
     password: `sidorov`,
-    passwordRepeated: `sidorov`,
-    avatar: `sidorov.jpg`
+    passwordRepeated: `sidorov`
   };
 
   let app;
