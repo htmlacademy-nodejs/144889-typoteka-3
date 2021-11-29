@@ -62,8 +62,11 @@ articlesRoutes.post(`/add`, auth, upload.single(`upload`), csrfProtection, async
     categories: Array.isArray(body.categories) ? body.categories : [body.categories],
     userId: user.id,
     createDate: new Date(body.createDate),
-    photo: file.filename
   };
+
+  if (file) {
+    articleData.photo = file.filename;
+  }
 
   try {
     await api.createArticle(articleData);
@@ -92,10 +95,16 @@ articlesRoutes.post(`/edit/:id`, auth, upload.single(`upload`), csrfProtection, 
     announce: body.announcement,
     fullText: body.fullText,
     categories: Array.isArray(body.categories) ? body.categories : [body.categories],
-    photo: file ? file.filename : body[`photo`],
     userId: user.id,
     createDate: new Date(body.createDate)
   };
+  if (!body[`photo`]) {
+    updateArticle.photo = null;
+  }
+
+  if (file) {
+    updateArticle.photo = file.filename;
+  }
 
   try {
     await api.updateArticle(updateArticle, id);

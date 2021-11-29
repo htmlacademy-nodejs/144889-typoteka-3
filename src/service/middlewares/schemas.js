@@ -60,7 +60,7 @@ const articleSchema = Joi.object({
   fullText: Joi.string().max(1000).messages({
     'string.max': ErrorArticleMessage.FULLTEXT_MAX
   }),
-  photo: Joi.string().messages({
+  photo: Joi.string().allow(null).messages({
     'string.empty': ErrorArticleMessage.PHOTO
   }),
   userId: Joi.number().integer().positive().required().messages({

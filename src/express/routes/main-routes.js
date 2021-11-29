@@ -48,7 +48,7 @@ mainRoutes.post(`/register`, upload.single(`avatar`), async (req, res) => {
   } catch (errors) {
     const validationMessages = prepareErrors(errors);
     const {user} = req.session;
-    res.render(`sign-up`, {validationMessages, user});
+    res.render(`sign-up`, {validationMessages, user, userData});
   }
 });
 

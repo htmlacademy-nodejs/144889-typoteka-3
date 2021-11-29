@@ -15,8 +15,9 @@ block content
               each category in article.categories
                 li.preview__breadcrumbs-item
                   a.preview__breadcrumbs-link(href=`/articles/category/${category.id}`) #{category.name}
-          .post__picture
-            img(src=`/img/${article.photo}` alt='Фото поста')
+          if article.photo
+            .post__picture
+              img(src=`/img/${article.photo}` alt='Фото поста')
           .post__text
             p.post__announce #{article.announce}
             p #{article.fullText}

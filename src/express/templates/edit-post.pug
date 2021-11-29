@@ -1,6 +1,16 @@
 extends layout.pug
 
 block content
+  script.
+    document.addEventListener("DOMContentLoaded", function(event) { 
+      const deletePhoto = (event) => {
+        event.preventDefault();
+        const elem = document.getElementById(`image-name-field`);
+        elem.value = null;
+      }
+      const button = document.getElementById(`button-delete-photo`);
+      button.addEventListener("click", deletePhoto);
+    });
   main
     section
       .popup.popup--new-publication.popup--anti
@@ -27,7 +37,7 @@ block content
                     label
                       input.visually-hidden(type='file' name='upload')
                       | Обзор
-                  button.button.button--transparent Удалить
+                  button.button.button--transparent#button-delete-photo Удалить
                 .new-publication__category-wrapper
                   .new-publication__checkbox.new-publication__checkbox--auto
                     each category in categories

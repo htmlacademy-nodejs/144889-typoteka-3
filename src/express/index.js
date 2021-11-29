@@ -25,6 +25,7 @@ if (!SESSION_SECRET) {
 const DEFAULT_PORT = 8080;
 
 const app = express();
+app.locals.moment = require(`moment`);
 
 app.use(express.json());
 
