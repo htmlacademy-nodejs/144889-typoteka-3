@@ -19,7 +19,7 @@ block content
               .form__wrapper.form__wrapper--intro
                 .form__field
                   label
-                    input(type='text' name='title' placeholder='Заголовок' required='')
+                    input(type='text' name='title' placeholder='Заголовок' required='' value=articleData ? articleData.title : '')
                 .form__field.form__field--post-image
                   label
                     input#image-name-field(type='text' name='photo' placeholder='Фотография' readonly='')
@@ -30,14 +30,14 @@ block content
                 .new-publication__category-wrapper
                   .new-publication__checkbox.new-publication__checkbox--auto
                     each category in categories
-                      input(id=category.id type='checkbox' name='categories' value=category.id)
+                      input(id=category.id type='checkbox' name='categories' value=category.id checked=articleData ? articleData.categories.includes(category.id.toString()) : false)
                       label(for=category.id) #{category.name}
                   a.new-publication__form-link.button.button--transparent(href='#') Добавить категорию
               .form__wrapper.form__wrapper--text
                 .form__field.form__field--publication-text
                   label
-                    textarea(rows='5' name='announce' placeholder='Анонс публикации')
+                    textarea(rows='5' name='announce' placeholder='Анонс публикации') #{articleData ? articleData.announce : ''}
                 .form__field.form__field--publication-text
                   label
-                    textarea(rows='10' name='fullText' placeholder='Полный текст публикации')
+                    textarea(rows='10' name='fullText' placeholder='Полный текст публикации') #{articleData ? articleData.fullText : ''}
             +insertErrorMessages(validationMessages)

@@ -74,7 +74,7 @@ articlesRoutes.post(`/add`, auth, upload.single(`upload`), csrfProtection, async
   } catch (errors) {
     const validationMessages = prepareErrors(errors);
     const categories = await getArticleCategories();
-    res.render(`new-post`, {categories, validationMessages, user, csrfToken: req.csrfToken()});
+    res.render(`new-post`, {categories, validationMessages, user, csrfToken: req.csrfToken(), articleData});
   }
 });
 
