@@ -1,6 +1,16 @@
 extends layout.pug
 
 block content
+  script.
+    document.addEventListener("DOMContentLoaded", function(event) { 
+      const deletePhoto = (event) => {
+        event.preventDefault();
+        const elem = document.getElementById(`image-name-field`);
+        elem.value = null;
+      }
+      const button = document.getElementById(`button-delete-photo`);
+      button.addEventListener("click", deletePhoto);
+    });
   main
     section
       .popup.popup--new-publication.popup--anti
@@ -8,16 +18,13 @@ block content
           form(action=`/articles/edit/${article.id}` method='POST' enctype="multipart/form-data" autocomplete="off")
             input(type="hidden" name="_csrf" value=csrfToken)
             .new-publication__header
-              h1 Новая публикация
+              h1 Редактирование публикации
               .new-publication__date-form
                 h3 Дата публикации
                 .new-publication__date-form-division
                   .new-publication__date-block
-                    label(for='new-publication-date' aria-label='Календарь')
-                    input#new-publication-date(type='text' name='date' placeholder='2019-03-21' value=article.createDate)
-              +insertErrorMessages(validationMessages)
+                    +editArticleDate(article.createDate)
               button.new-publication__button.button.button--colored(type='submit') Опубликовать
-            a.popup__button.button.button--popup-close(aria-label='Закрыть окно') Закрыть окно
             .new-publication__form.form
               .form__wrapper.form__wrapper--intro
                 .form__field
@@ -30,11 +37,11 @@ block content
                     label
                       input.visually-hidden(type='file' name='upload')
                       | Обзор
-                  button.button.button--transparent Удалить
+                  button.button.button--transparent#button-delete-photo Удалить
                 .new-publication__category-wrapper
                   .new-publication__checkbox.new-publication__checkbox--auto
                     each category in categories
-                      input(id=category.id type='checkbox' name='category' checked=article.categories.some(item => item.id === category.id) value=category.name)
+                      input(id=category.id type='checkbox' name='categories' checked=article.categories.some(item => item.id === category.id) value=category.id)
                       label(for=category.id) #{category.name}
                   a.new-publication__form-link.button.button--transparent(href='#') Добавить категорию
               .form__wrapper.form__wrapper--text
@@ -44,3 +51,4 @@ block content
                 .form__field.form__field--publication-text
                   label
                     textarea(rows='10' name='fullText' placeholder='Полный текст публикации') #{article.fullText}
+            +insertErrorMessages(validationMessages)

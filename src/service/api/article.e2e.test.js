@@ -17,13 +17,15 @@ const mockUsers = [
     name: `Иван Иванов`,
     email: `ivanov@example.com`,
     passwordHash: passwordUtils.hashSync(`ivanov`),
-    avatar: `avatar-1.png`
+    avatar: `avatar-1.png`,
+    isOwner: true
   },
   {
     name: `Пётр Петров`,
     email: `petrov@example.com`,
     passwordHash: passwordUtils.hashSync(`petrov`),
-    avatar: `avatar-2.png`
+    avatar: `avatar-2.png`,
+    isOwner: false
   }
 ];
 
@@ -44,7 +46,8 @@ describe(`Article API creates an article if data is valid`, () => {
     fullText: `Нужно всего лишь зайти на Алиэкспресс и заказать необходимы компоненты. Однако самая большая сложность - ПО. Но OpenSource приходит к нам на помощь!`,
     categories: [1, 2, 3],
     photo: `forest@2x.jpg`,
-    userId: 1
+    userId: 1,
+    createDate: `2021-11-20T01:50:57.000Z`
   };
 
   let response;
@@ -170,7 +173,8 @@ describe(`Article API changes existent article`, () => {
     fullText: `Нужно всего лишь зайти на Алиэкспресс и заказать необходимы компоненты. Однако самая большая сложность - ПО. Но OpenSource приходит к нам на помощь!`,
     categories: [3, 4, 5],
     photo: `forest@2x.jpg`,
-    userId: 1
+    userId: 1,
+    createDate: `2021-11-20T01:50:57.000Z`
   };
 
   let response;
@@ -199,7 +203,8 @@ describe(`Article API refuses when trying to change non-existent article`, () =>
     fullText: `Нужно всего лишь зайти на Алиэкспресс и заказать необходимы компоненты. Однако самая большая сложность - ПО. Но OpenSource приходит к нам на помощь!`,
     categories: [1, 2, 3, 4],
     photo: `forest@2x.jpg`,
-    userId: 1
+    userId: 1,
+    createDate: `2021-11-20T01:50:57.000Z`
   };
 
   let response;
@@ -284,6 +289,22 @@ describe(`Article API returns a list of comments to given article`, () => {
   test(`Returns list of 4 comments`, () => expect(response.body.length).toBe(4));
 
   test(`First comment's text is "Согласен с автором! Планируете записать видосик на эту тему? Совсем немного... Плюсую, но слишком много буквы! Хочу такую же футболку :-)"`, () => expect(response.body[0].text).toBe(`Согласен с автором! Планируете записать видосик на эту тему? Совсем немного... Плюсую, но слишком много буквы! Хочу такую же футболку :-)`));
+});
+
+describe(`Article API returns a list of all comments`, () => {
+
+  let response;
+  let app;
+
+  beforeAll(async () => {
+    app = await createAPI();
+    response = await request(app)
+      .get(`/articles/comments`);
+  });
+
+  test(`Status code 200`, () => expect(response.statusCode).toBe(HttpCode.OK));
+
+  test(`Returns list of 20 comments`, () => expect(response.body.length).toBe(20));
 });
 
 describe(`Article API creates a comment if data is valid`, () => {

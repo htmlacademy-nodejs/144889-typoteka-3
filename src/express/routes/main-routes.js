@@ -3,7 +3,6 @@
 const api = require(`../api`).getApi();
 const upload = require(`../middlewares/upload`);
 const {prepareErrors} = require(`../../utils`);
-const auth = require(`../middlewares/auth`);
 
 const {Router} = require(`express`);
 const mainRoutes = new Router();
@@ -16,12 +15,15 @@ mainRoutes.get(`/`, async (req, res) => {
   page = +page;
   const limit = ARTICLES_PER_PAGE;
   const offset = (page - 1) * ARTICLES_PER_PAGE;
-  const [{count, articles}, categories] = await Promise.all([
+  const [{count, articles}, categories, comments] = await Promise.all([
     api.getArticles({offset, limit, comments: true}),
-    api.getCategories(true)
+    api.getCategories(true),
+    api.getAllComments()
   ]);
   const totalPages = Math.ceil(count / ARTICLES_PER_PAGE);
-  res.render(`main`, {articles, page, totalPages, categories, user});
+  const bestCommentedArticles = articles.filter((item) => item.comments.length > 0).sort((a, b) => a.comments.length > b.comments.length).slice(0, 4);
+  const lastComments = comments.slice(0, 3);
+  res.render(`main`, {articles, page, totalPages, categories, user, bestCommentedArticles, lastComments});
 });
 
 mainRoutes.get(`/register`, (req, res) => {
@@ -32,19 +34,21 @@ mainRoutes.get(`/register`, (req, res) => {
 mainRoutes.post(`/register`, upload.single(`avatar`), async (req, res) => {
   const {body, file} = req;
   const userData = {
-    avatar: file ? file.filename : ``,
     name: body[`name`],
     email: body[`email`],
     password: body[`password`],
     passwordRepeated: body[`repeat-password`]
   };
+  if (file) {
+    userData.avatar = file.filename;
+  }
   try {
     await api.createUser(userData);
     res.redirect(`/login`);
   } catch (errors) {
     const validationMessages = prepareErrors(errors);
     const {user} = req.session;
-    res.render(`sign-up`, {validationMessages, user});
+    res.render(`sign-up`, {validationMessages, user, userData});
   }
 });
 
@@ -82,7 +86,5 @@ mainRoutes.get(`/search`, async (req, res) => {
     res.render(`search`, {results: [], search, user});
   }
 });
-
-mainRoutes.get(`/categories`, auth, (req, res) => res.render(`all-categories`));
 
 module.exports = mainRoutes;

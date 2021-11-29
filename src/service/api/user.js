@@ -20,6 +20,7 @@ module.exports = (app, service) => {
     const data = req.body;
 
     data.passwordHash = await passwordUtils.hash(data.password);
+    data.isOwner = false;
 
     const result = await service.create(data);
 

@@ -53,25 +53,27 @@ class ArticleService {
     const articles = await this._Article.findAll({
       include,
       order: [
-        [`createdAt`, `DESC`]
+        [`createDate`, `DESC`]
       ]
     });
     return articles.map((item) => item.get());
   }
 
   async findOne(id, needComments) {
-    const include = [
-      Aliase.CATEGORIES,
-      {
-        model: this._User,
-        as: Aliase.USERS,
-        attributes: {
-          exclude: [`passwordHash`]
+    const options = {
+      include: [
+        Aliase.CATEGORIES,
+        {
+          model: this._User,
+          as: Aliase.USERS,
+          attributes: {
+            exclude: [`passwordHash`]
+          }
         }
-      }
-    ];
+      ]
+    };
     if (needComments) {
-      include.push({
+      options.include.push({
         model: this._Comment,
         as: Aliase.COMMENTS,
         include: [
@@ -84,8 +86,11 @@ class ArticleService {
           }
         ]
       });
+      options.order = [
+        [{model: this._Comment, as: Aliase.COMMENTS}, `createdAt`, `DESC`]
+      ];
     }
-    const article = await this._Article.findByPk(id, {include});
+    const article = await this._Article.findByPk(id, options);
     return article;
   }
 
@@ -120,7 +125,7 @@ class ArticleService {
       offset,
       include,
       order: [
-        [`createdAt`, `DESC`]
+        [`createDate`, `DESC`]
       ],
       distinct: true
     });

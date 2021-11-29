@@ -7,6 +7,7 @@ const session = require(`express-session`);
 const mainRoutes = require(`./routes/main-routes`);
 const myRoutes = require(`./routes/my-routes`);
 const articlesRoutes = require(`./routes/articles-routes`);
+const categoriesRoutes = require(`./routes/categories-routes`);
 const {HttpCode} = require(`../constants`);
 const sequelize = require(`../service/lib/sequelize`);
 const SequelizeStore = require(`connect-session-sequelize`)(session.Store);
@@ -24,6 +25,7 @@ if (!SESSION_SECRET) {
 const DEFAULT_PORT = 8080;
 
 const app = express();
+app.locals.moment = require(`moment`);
 
 app.use(express.json());
 
@@ -48,6 +50,7 @@ app.use(session({
 app.use(`/`, mainRoutes);
 app.use(`/my`, myRoutes);
 app.use(`/articles`, articlesRoutes);
+app.use(`/categories`, categoriesRoutes);
 
 app.use(express.static(path.resolve(__dirname, DIR.PUBLIC)));
 app.use(express.static(path.resolve(__dirname, DIR.UPLOAD)));

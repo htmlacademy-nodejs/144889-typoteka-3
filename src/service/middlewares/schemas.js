@@ -12,13 +12,12 @@ const ErrorCommentMessage = {
 
 const ErrorArticleMessage = {
   CATEGORIES: `Не выбрана ни одна категория объявления`,
-  TITLE_MIN: `Заголовок содержит меньше 10 символов`,
+  TITLE_MIN: `Заголовок содержит меньше 30 символов`,
   TITLE_MAX: `Заголовок не может содержать более 70 символов`,
-  ANNOUNCE_MIN: `Краткое описание содержит меньше 100 символов`,
-  ANNOUNCE_MAX: `Краткое описание не может содержать более 300 символов`,
-  FULLTEXT_MIN: `Текст статьи содержит меньше 100 символов`,
+  ANNOUNCE_MIN: `Краткое описание содержит меньше 30 символов`,
+  ANNOUNCE_MAX: `Краткое описание не может содержать более 250 символов`,
   FULLTEXT_MAX: `Текст статьи не может содержать более 1000 символов`,
-  PHOTO: `Изображение не выбрано или тип изображения не поддерживается`,
+  PHOTO: `Тип изображения не поддерживается`,
   USER_ID: `Некорректный идентификатор пользователя`
 };
 
@@ -26,8 +25,12 @@ const ErrorUserMessage = {
   NAME: `Имя содержит некорректные символы`,
   EMAIL: `Некорректный электронный адрес`,
   PASSWORD: `Пароль содержит меньше 6-ти символов`,
-  PASSWORD_REPEATED: `Пароли не совпадают`,
-  AVATAR: `Изображение не выбрано или тип изображения не поддерживается`
+  PASSWORD_REPEATED: `Пароли не совпадают`
+};
+
+const ErrorCategoryMessage = {
+  NAME_MIN: `Название категории содержит меньше 5 символов`,
+  NAME_MAX: `Название категории не может содержать более 30 символов`,
 };
 
 const commentSchema = Joi.object({
@@ -46,24 +49,24 @@ const articleSchema = Joi.object({
         'number.base': ErrorArticleMessage.CATEGORIES
       })
   ).min(1).required(),
-  title: Joi.string().min(10).max(70).required().messages({
+  title: Joi.string().min(30).max(250).required().messages({
     'string.min': ErrorArticleMessage.TITLE_MIN,
     'string.max': ErrorArticleMessage.TITLE_MAX
   }),
-  announce: Joi.string().min(100).max(300).required().messages({
+  announce: Joi.string().min(30).max(250).required().messages({
     'string.min': ErrorArticleMessage.ANNOUNCE_MIN,
     'string.max': ErrorArticleMessage.ANNOUNCE_MAX
   }),
-  fullText: Joi.string().min(100).max(1000).required().messages({
-    'string.min': ErrorArticleMessage.FULLTEXT_MIN,
+  fullText: Joi.string().max(1000).messages({
     'string.max': ErrorArticleMessage.FULLTEXT_MAX
   }),
-  photo: Joi.string().required().messages({
+  photo: Joi.string().allow(null).messages({
     'string.empty': ErrorArticleMessage.PHOTO
   }),
   userId: Joi.number().integer().positive().required().messages({
     'number.base': ErrorArticleMessage.USER_ID
-  })
+  }),
+  createDate: Joi.date().required(),
 });
 
 const userSchema = Joi.object({
@@ -79,9 +82,8 @@ const userSchema = Joi.object({
   passwordRepeated: Joi.string().required().valid(Joi.ref(`password`)).required().messages({
     'any.only': ErrorUserMessage.PASSWORD_REPEATED
   }),
-  avatar: Joi.string().required().messages({
-    'string.empty': ErrorUserMessage.AVATAR
-  })
+  avatar: Joi.string(),
+  isOwner: Joi.boolean(),
 });
 
 const routeParamsSchema = Joi.object({
@@ -89,9 +91,17 @@ const routeParamsSchema = Joi.object({
   commentId: Joi.number().integer().min(1)
 });
 
+const categorySchema = Joi.object({
+  name: Joi.string().min(5).max(30).required().messages({
+    'string.min': ErrorCategoryMessage.NAME_MIN,
+    'string.max': ErrorCategoryMessage.NAME_MAX,
+  })
+});
+
 module.exports = {
   [Instances.COMMENT]: commentSchema,
   [Instances.ARTICLE]: articleSchema,
+  [Instances.CATEGORY]: categorySchema,
   userSchema,
   routeParamsSchema
 };

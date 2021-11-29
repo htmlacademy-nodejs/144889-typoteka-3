@@ -13,16 +13,16 @@ block content
           form(action='/register' method='post' enctype="multipart/form-data" autocomplete="off")
             .form__field
               label
-                input(type='email' name='email' placeholder='Электронная почта' required='')
+                input(type='email' name='email' placeholder='Электронная почта' required='' value=userData ? userData.email : '')
             .form__field
               label
-                input(type='text' name='name' placeholder='Имя Фамилия' required='')
+                input(type='text' name='name' placeholder='Имя Фамилия' required='' value=userData ? userData.name : '')
             .form__field
               label
-                input(type='password' name='password' placeholder='Пароль' required='')
+                input(type='password' name='password' placeholder='Пароль' required='' value=userData ? userData.password : '')
             .form__field
               label
-                input(type='password' name='repeat-password' placeholder='Повтор пароля' required='')
+                input(type='password' name='repeat-password' placeholder='Повтор пароля' required='' value=userData ? userData[`repeat-password`] : '')
             if validationMessages
               .form__validation-error
                 p.form__error-message При регистрации произошли ошибки:

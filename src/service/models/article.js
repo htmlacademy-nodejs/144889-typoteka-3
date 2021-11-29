@@ -21,6 +21,10 @@ const define = (sequelize) => Article.init({
     type: DataTypes.STRING,
     allowNull: true
   },
+  createDate: {
+    type: DataTypes.DATE,
+    allowNull: false
+  },
 }, {
   sequelize,
   modelName: `Article`,

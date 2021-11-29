@@ -15,8 +15,8 @@ myRoutes.get(`/`, async (req, res) => {
 
 myRoutes.get(`/comments`, async (req, res) => {
   const {user} = req.session;
-  const articles = await api.getArticles({comments: true});
-  res.render(`comments`, {articles, user});
+  const comments = await api.getAllComments();
+  res.render(`comments`, {user, comments});
 });
 
 module.exports = myRoutes;
