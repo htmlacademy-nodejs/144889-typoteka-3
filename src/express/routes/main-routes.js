@@ -21,8 +21,10 @@ mainRoutes.get(`/`, async (req, res) => {
     api.getAllComments()
   ]);
   const totalPages = Math.ceil(count / ARTICLES_PER_PAGE);
-  const bestCommentedArticles = articles.filter((item) => item.comments.length > 0).sort((a, b) => a.comments.length > b.comments.length).slice(0, 4);
-  const lastComments = comments.slice(0, 3);
+  const allArticles = articles.filter((item) => item.comments.length > 0);
+  allArticles.sort((a, b) => b.comments.length - a.comments.length);
+  const bestCommentedArticles = allArticles.slice(0, 4);
+  const lastComments = comments.slice(0, 4);
   res.render(`main`, {articles, page, totalPages, categories, user, bestCommentedArticles, lastComments});
 });
 

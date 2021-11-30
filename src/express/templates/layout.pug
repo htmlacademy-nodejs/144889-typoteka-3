@@ -148,5 +148,9 @@ html(lang='ru')
       include partials/header.pug
       block content
       include partials/footer.pug
+      include partials/last-comment-template.pug
+      include partials/best-commented-articles-template.pug
+    script(src='https://cdn.socket.io/4.0.1/socket.io.js')
     script(src='/js/vendor.js')
     script(src='/js/main.js')
+    script(src='/js/socket.js')

@@ -1,6 +1,9 @@
 'use strict';
 
 const express = require(`express`);
+const http = require(`http`);
+
+const socket = require(`../lib/socket`);
 const {HttpCode, API_PREFIX, ExitCode} = require(`../../constants`);
 const {getLogger} = require(`../lib/logger`);
 const routes = require(`../api`);
@@ -25,6 +28,10 @@ module.exports = {
     const port = Number.parseInt(customPort, 10) || DEFAULT_PORT;
 
     const app = express();
+    const server = http.createServer(app);
+    const io = socket(server);
+
+    app.locals.socketio = io;
 
     app.use(express.json());
 
@@ -49,7 +56,7 @@ module.exports = {
     });
 
     try {
-      app.listen(port, (err) => {
+      server.listen(port, (err) => {
         if (err) {
           return logger.error(`An error occured on server creation: ${err.message}`);
         }
