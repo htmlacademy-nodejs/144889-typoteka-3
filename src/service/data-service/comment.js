@@ -9,11 +9,21 @@ class CommentService {
     this._User = sequelize.models.User;
   }
 
-  create(articleId, comment) {
-    return this._Comment.create({
-      articleId,
-      ...comment
+  async create(articleId, comment) {
+    const createdComment = await this._Comment.create({articleId, ...comment});
+    const newComment = await this._Comment.findOne({
+      where: {id: createdComment.id},
+      include: [
+        {
+          model: this._User,
+          as: Aliase.USERS,
+          attributes: {
+            exclude: [`passwordHash`]
+          }
+        }
+      ]
     });
+    return newComment;
   }
 
   async delete(id) {

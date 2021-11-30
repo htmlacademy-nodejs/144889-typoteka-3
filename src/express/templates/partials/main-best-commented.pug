@@ -7,7 +7,6 @@ section.main-page__hot.hot
       each article in bestCommentedArticles
         li.hot__list-item
           a.hot__list-link(href=`/articles/${article.id}`) #{article.announce.length > 100 ? article.announce.slice(0, 100).concat('...') : article.announce}
-            if article.comments
-              sup.hot__link-sup #{article.comments.length}
+            sup.hot__link-sup #{article.comments.length}
     else
       p Здесь пока ничего нет :(

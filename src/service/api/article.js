@@ -111,7 +111,14 @@ module.exports = (app, articleService, commentService) => {
   route.post(`/:articleId/comments`, [routeParamsValidator, articleExist(articleService), instanceValidator(Instances.COMMENT)], async (req, res) => {
     const {articleId} = req.params;
     const createdComment = await commentService.create(articleId, req.body);
+    const allArticles = await articleService.findAll(true);
 
+    const articlesWithComments = allArticles.filter((item) => item.comments.length > 0);
+    articlesWithComments.sort((a, b) => b.comments.length - a.comments.length);
+    const bestCommentedArticles = articlesWithComments.slice(0, 4);
+
+    const io = req.app.locals.socketio;
+    io.emit(`comment:create`, createdComment, bestCommentedArticles);
     return res.status(HttpCode.CREATED).json(createdComment);
   });
 };
