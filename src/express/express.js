@@ -12,12 +12,13 @@ const {HttpCode} = require(`../constants`);
 const sequelize = require(`../service/lib/sequelize`);
 const SequelizeStore = require(`connect-session-sequelize`)(session.Store);
 
-const DIR = {
+const DEFAULT_PORT = 8080;
+const {SESSION_SECRET} = process.env;
+
+const Dir = {
   PUBLIC: `public`,
   UPLOAD: `upload`
 };
-const DEFAULT_PORT = 8080;
-const {SESSION_SECRET} = process.env;
 
 if (!SESSION_SECRET) {
   throw new Error(`SESSION_SECRET environment variable is not defined`);
@@ -51,8 +52,8 @@ app.use(`/my`, myRoutes);
 app.use(`/articles`, articlesRoutes);
 app.use(`/categories`, categoriesRoutes);
 
-app.use(express.static(path.resolve(__dirname, DIR.PUBLIC)));
-app.use(express.static(path.resolve(__dirname, DIR.UPLOAD)));
+app.use(express.static(path.resolve(__dirname, Dir.PUBLIC)));
+app.use(express.static(path.resolve(__dirname, Dir.UPLOAD)));
 
 app.use((req, res) => res.status(HttpCode.BAD_REQUEST).render(`errors/404`));
 app.use((err, _req, res, _next) => {

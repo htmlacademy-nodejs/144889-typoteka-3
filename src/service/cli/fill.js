@@ -7,12 +7,12 @@ const {
 const fs = require(`fs`).promises;
 const chalk = require(`chalk`);
 
-const {MAX_COMMENTS} = require(`../../constants`);
+const {MAX_COMMENTS, ANNOUNCE_SENTENCES_LIMIT} = require(`../../constants`);
 
 const DEFAULT_COUNT = 1;
 const FILE_NAME = `fill-db.sql`;
 
-const SOURCES = {
+const Source = {
   SENTENCES: `./data/sentences.txt`,
   TITLES: `./data/titles.txt`,
   CATEGORIES: `./data/categories.txt`,
@@ -59,7 +59,7 @@ const generateComments = (count, articleId, userCount, comments) => (
 const generateArticles = (count, titles, categories, userCount, sentences, comments) => (
   Array(count).fill({}).map((_, index) => ({
     title: titles[getRandomInt(0, titles.length - 1)],
-    announce: shuffle(sentences).slice(1, 5).join(` `),
+    announce: shuffle(sentences).slice(1, ANNOUNCE_SENTENCES_LIMIT).join(` `),
     fullText: shuffle(sentences).slice(1, getRandomInt(6, (sentences.length - 1))).join(` `),
     category: getRandomArrayPart(categories),
     comments: generateComments(getRandomInt(2, MAX_COMMENTS), index + 1, userCount, comments),
@@ -70,7 +70,7 @@ const generateArticles = (count, titles, categories, userCount, sentences, comme
 module.exports = {
   name: `--fill`,
   async run(args) {
-    const data = await Promise.all(Object.values(SOURCES).map((path) => readFile(path)));
+    const data = await Promise.all(Object.values(Source).map((path) => readFile(path)));
     const [sentences, titles, categories, commentSentences] = data;
     const [count] = args;
     const countArticles = Number.parseInt(count, 10) || DEFAULT_COUNT;
