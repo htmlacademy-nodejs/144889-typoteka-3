@@ -118,7 +118,10 @@ module.exports = (app, articleService, commentService) => {
     const bestCommentedArticles = articlesWithComments.slice(0, 4);
 
     const io = req.app.locals.socketio;
-    io.emit(`comment:create`, createdComment, bestCommentedArticles);
+    if (io) {
+      io.emit(`comment:create`, createdComment, bestCommentedArticles);
+    }
+
     return res.status(HttpCode.CREATED).json(createdComment);
   });
 };
