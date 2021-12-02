@@ -16,13 +16,12 @@ const DIR = {
   PUBLIC: `public`,
   UPLOAD: `upload`
 };
-
+const DEFAULT_PORT = 8080;
 const {SESSION_SECRET} = process.env;
+
 if (!SESSION_SECRET) {
   throw new Error(`SESSION_SECRET environment variable is not defined`);
 }
-
-const DEFAULT_PORT = 8080;
 
 const app = express();
 app.locals.moment = require(`moment`);

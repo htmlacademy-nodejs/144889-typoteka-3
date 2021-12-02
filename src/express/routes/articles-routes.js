@@ -8,6 +8,8 @@ const upload = require(`../middlewares/upload`);
 const {prepareErrors} = require(`../../utils`);
 const auth = require(`../middlewares/auth`);
 
+const ARTICLES_PER_PAGE = 8;
+
 const articlesRoutes = new Router();
 const csrfProtection = csrf();
 
@@ -26,8 +28,6 @@ const getEditArticleData = async (articleId) => {
 const getViewArticleData = async (articleId, comments) => {
   return await api.getArticle(articleId, comments);
 };
-
-const ARTICLES_PER_PAGE = 8;
 
 articlesRoutes.get(`/category/:categoryId`, async (req, res) => {
   const {user} = req.session;

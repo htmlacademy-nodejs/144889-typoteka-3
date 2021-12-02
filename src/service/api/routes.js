@@ -1,13 +1,13 @@
 'use strict';
 
 const {Router} = require(`express`);
-const article = require(`../api/article`);
-const category = require(`../api/category`);
-const search = require(`../api/search`);
-const user = require(`../api/user`);
+const article = require(`./article`);
+const category = require(`./category`);
+const search = require(`./search`);
+const user = require(`./user`);
 
 const sequelize = require(`../lib/sequelize`);
-const defineModels = require(`../models`);
+const defineModels = require(`../models/define-models`);
 
 const {
   ArticleService,

@@ -17,10 +17,12 @@ const {MAX_COMMENTS, ExitCode} = require(`../../constants`);
 
 const DEFAULT_COUNT = 1;
 
-const FILE_SENTENCES_PATH = `./data/sentences.txt`;
-const FILE_TITLES_PATH = `./data/titles.txt`;
-const FILE_CATEGORIES_PATH = `./data/categories.txt`;
-const FILE_COMMENTS_PATH = `./data/comments.txt`;
+const FilePath = {
+  SENTENCES: `./data/sentences.txt`,
+  TITLES: `./data/titles.txt`,
+  CATEGORIES: `./data/categories.txt`,
+  COMMENTS: `./data/comments.txt`
+};
 
 const readFile = async (filePath) => {
   try {
@@ -59,7 +61,7 @@ module.exports = {
     }
     logger.info(`The connection to database is established`);
 
-    const data = await Promise.all([readFile(FILE_SENTENCES_PATH), readFile(FILE_TITLES_PATH), readFile(FILE_CATEGORIES_PATH), readFile(FILE_COMMENTS_PATH)]);
+    const data = await Promise.all([readFile(FilePath.SENTENCES), readFile(FilePath.TITLES), readFile(FilePath.CATEGORIES), readFile(FilePath.COMMENTS)]);
     const users = [
       {
         name: `Иван Иванов`,
