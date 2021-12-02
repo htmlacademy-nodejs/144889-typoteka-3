@@ -6,6 +6,10 @@ const USER_ARGV_INDEX = 2;
 
 const MAX_COMMENTS = 4;
 
+const ANNOUNCE_SENTENCES_LIMIT = 5;
+
+const MAX_ELEMENTS_PER_BLOCK = 4;
+
 const API_PREFIX = `/api`;
 
 const ExitCode = {
@@ -53,5 +57,7 @@ module.exports = {
   Env,
   HttpMethod,
   Instance,
-  FILE_TYPES
+  FILE_TYPES,
+  ANNOUNCE_SENTENCES_LIMIT,
+  MAX_ELEMENTS_PER_BLOCK
 };

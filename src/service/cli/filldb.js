@@ -13,7 +13,7 @@ const sequelize = require(`../lib/sequelize`);
 const passwordUtils = require(`../lib/password`);
 const initDatabase = require(`../lib/init-db`);
 
-const {MAX_COMMENTS, ExitCode} = require(`../../constants`);
+const {MAX_COMMENTS, ExitCode, ANNOUNCE_SENTENCES_LIMIT} = require(`../../constants`);
 
 const DEFAULT_COUNT = 1;
 
@@ -38,7 +38,7 @@ const generatePosts = (count, [sentences, titles, categories, comments], users) 
   Array(count).fill({}).map(() => ({
     title: titles[getRandomInt(0, titles.length - 1)],
     createDate: getRandomDate(),
-    announce: shuffle(sentences).slice(1, 5).join(` `),
+    announce: shuffle(sentences).slice(1, ANNOUNCE_SENTENCES_LIMIT).join(` `),
     fullText: shuffle(sentences).slice(1, getRandomInt(6, (sentences.length - 1))).join(` `),
     categories: getRandomSubarray(categories),
     comments: generateComments(MAX_COMMENTS, comments, users),

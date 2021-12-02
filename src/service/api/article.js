@@ -1,7 +1,7 @@
 'use strict';
 
 const {Router} = require(`express`);
-const {HttpCode, Instance} = require(`../../constants`);
+const {HttpCode, Instance, MAX_ELEMENTS_PER_BLOCK} = require(`../../constants`);
 const articleExist = require(`../middlewares/article-exist`);
 const instanceValidator = require(`../middlewares/instance-validator`);
 const routeParamsValidator = require(`../middlewares/route-params-validator`);
@@ -115,7 +115,7 @@ module.exports = (app, articleService, commentService) => {
 
     const articlesWithComments = allArticles.filter((item) => item.comments.length > 0);
     articlesWithComments.sort((a, b) => b.comments.length - a.comments.length);
-    const bestCommentedArticles = articlesWithComments.slice(0, 4);
+    const bestCommentedArticles = articlesWithComments.slice(0, MAX_ELEMENTS_PER_BLOCK);
 
     const io = req.app.locals.socketio;
     if (io) {

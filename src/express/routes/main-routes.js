@@ -3,11 +3,11 @@
 const api = require(`../api`).getApi();
 const upload = require(`../middlewares/upload`);
 const {prepareErrors} = require(`../../utils`);
+const {MAX_ELEMENTS_PER_BLOCK} = require(`../../constants`);
 
 const {Router} = require(`express`);
 
 const ARTICLES_PER_PAGE = 8;
-const MAX_ELEMENTS_PER_BLOCK = 4;
 
 const mainRoutes = new Router();
 
