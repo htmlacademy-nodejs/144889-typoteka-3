@@ -5,9 +5,11 @@ const upload = require(`../middlewares/upload`);
 const {prepareErrors} = require(`../../utils`);
 
 const {Router} = require(`express`);
-const mainRoutes = new Router();
 
 const ARTICLES_PER_PAGE = 8;
+const MAX_ELEMENTS_PER_BLOCK = 4;
+
+const mainRoutes = new Router();
 
 mainRoutes.get(`/`, async (req, res) => {
   const {user} = req.session;
@@ -23,8 +25,8 @@ mainRoutes.get(`/`, async (req, res) => {
   const totalPages = Math.ceil(count / ARTICLES_PER_PAGE);
   const allArticles = articles.filter((item) => item.comments.length > 0);
   allArticles.sort((a, b) => b.comments.length - a.comments.length);
-  const bestCommentedArticles = allArticles.slice(0, 4);
-  const lastComments = comments.slice(0, 4);
+  const bestCommentedArticles = allArticles.slice(0, MAX_ELEMENTS_PER_BLOCK);
+  const lastComments = comments.slice(0, MAX_ELEMENTS_PER_BLOCK);
   res.render(`main`, {articles, page, totalPages, categories, user, bestCommentedArticles, lastComments});
 });
 

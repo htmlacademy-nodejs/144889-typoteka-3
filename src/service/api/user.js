@@ -3,7 +3,7 @@
 const {Router} = require(`express`);
 const {HttpCode} = require(`../../constants`);
 
-const userValidator = require(`../middlewares/userValidator`);
+const userValidator = require(`../middlewares/user-validator`);
 
 const passwordUtils = require(`../lib/password`);
 

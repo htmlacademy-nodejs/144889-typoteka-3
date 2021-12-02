@@ -1,8 +1,8 @@
 'use strict';
 
 const {Router} = require(`express`);
-const {HttpCode, Instances} = require(`../../constants`);
-const instanceValidator = require(`../middlewares/instanceValidator`);
+const {HttpCode, Instance} = require(`../../constants`);
+const instanceValidator = require(`../middlewares/instance-validator`);
 
 module.exports = (app, categoryService) => {
   const route = new Router();
@@ -30,14 +30,14 @@ module.exports = (app, categoryService) => {
   });
 
   // POST /api/categories/
-  route.post(`/`, instanceValidator(Instances.CATEGORY), async (req, res) => {
+  route.post(`/`, instanceValidator(Instance.CATEGORY), async (req, res) => {
     const createdCategory = await categoryService.create(req.body);
 
     return res.status(HttpCode.CREATED).json(createdCategory);
   });
 
   // PUT /api/categories/:categoryId
-  route.put(`/:categoryId`, instanceValidator(Instances.CATEGORY), async (req, res) => {
+  route.put(`/:categoryId`, instanceValidator(Instance.CATEGORY), async (req, res) => {
     const {categoryId} = req.params;
     const updatedCategory = await categoryService.update(categoryId, req.body);
 

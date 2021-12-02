@@ -1,10 +1,10 @@
 'use strict';
 
 const {Router} = require(`express`);
-const {HttpCode, Instances} = require(`../../constants`);
-const articleExist = require(`../middlewares/articleExist`);
-const instanceValidator = require(`../middlewares/instanceValidator`);
-const routeParamsValidator = require(`../middlewares/routeParamsValidator`);
+const {HttpCode, Instance} = require(`../../constants`);
+const articleExist = require(`../middlewares/article-exist`);
+const instanceValidator = require(`../middlewares/instance-validator`);
+const routeParamsValidator = require(`../middlewares/route-params-validator`);
 
 module.exports = (app, articleService, commentService) => {
   const route = new Router();
@@ -44,14 +44,14 @@ module.exports = (app, articleService, commentService) => {
   });
 
   // POST /api/articles
-  route.post(`/`, instanceValidator(Instances.ARTICLE), async (req, res) => {
+  route.post(`/`, instanceValidator(Instance.ARTICLE), async (req, res) => {
     const article = await articleService.create(req.body);
     return res.status(HttpCode.CREATED)
       .json(article);
   });
 
   // PUT /api/articles/:articleId
-  route.put(`/:articleId`, [routeParamsValidator, instanceValidator(Instances.ARTICLE)], async (req, res) => {
+  route.put(`/:articleId`, [routeParamsValidator, instanceValidator(Instance.ARTICLE)], async (req, res) => {
     const {articleId} = req.params;
     const updatedArticle = await articleService.update(articleId, req.body);
 
@@ -108,7 +108,7 @@ module.exports = (app, articleService, commentService) => {
   });
 
   // POST /api/articles/:articleId/comments
-  route.post(`/:articleId/comments`, [routeParamsValidator, articleExist(articleService), instanceValidator(Instances.COMMENT)], async (req, res) => {
+  route.post(`/:articleId/comments`, [routeParamsValidator, articleExist(articleService), instanceValidator(Instance.COMMENT)], async (req, res) => {
     const {articleId} = req.params;
     const createdComment = await commentService.create(articleId, req.body);
     const allArticles = await articleService.findAll(true);

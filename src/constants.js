@@ -35,7 +35,7 @@ const HttpMethod = {
   DELETE: `DELETE`
 };
 
-const Instances = {
+const Instance = {
   COMMENT: `comment`,
   ARTICLE: `article`,
   CATEGORY: `category`
@@ -52,6 +52,6 @@ module.exports = {
   HttpCode,
   Env,
   HttpMethod,
-  Instances,
+  Instance,
   FILE_TYPES
 };

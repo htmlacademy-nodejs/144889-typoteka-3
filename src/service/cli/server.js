@@ -6,7 +6,7 @@ const http = require(`http`);
 const socket = require(`../lib/socket`);
 const {HttpCode, API_PREFIX, ExitCode} = require(`../../constants`);
 const {getLogger} = require(`../lib/logger`);
-const routes = require(`../api`);
+const routes = require(`../api/routes`);
 const sequelize = require(`../lib/sequelize`);
 
 const DEFAULT_PORT = 3000;
